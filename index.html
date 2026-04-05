@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>エニアグラム｜伝わらないを、伝わるに変える</title>
+  <meta name="description" content="エニアグラムで自分と相手を深く知る。タイプ別の言い回し翻訳機・相性チェック・日々のメッセージをLINEで。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purple: #7C3AED;
+      --purple-light: #A78BFA;
+      --purple-pale: #EDE9FE;
+      --pink: #EC4899;
+      --pink-pale: #FCE7F3;
+      --text: #1F1235;
+      --text-muted: #6B7280;
+      --bg: #FAFAFA;
+      --white: #FFFFFF;
+      --line-green: #06C755;
+      --border: #E5E7EB;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+
+    .header-inner {
+      max-width: 900px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 17px; color: var(--purple);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    .btn-line-sm {
+      background: var(--line-green);
+      color: #fff; font-weight: 700; font-size: 13px;
+      border: none; border-radius: 24px;
+      padding: 8px 18px; cursor: pointer;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+      transition: opacity 0.2s;
+    }
+
+    .btn-line-sm:hover { opacity: 0.85; }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(160deg, #F5F3FF 0%, #FDF4FF 50%, #FFF1F9 100%);
+      padding: 72px 24px 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: var(--purple-pale);
+      color: var(--purple);
+      font-size: 12px; font-weight: 700;
+      padding: 4px 14px; border-radius: 20px;
+      margin-bottom: 20px; letter-spacing: 0.05em;
+    }
+
+    .hero-title {
+      font-size: clamp(26px, 6vw, 40px);
+      font-weight: 700; line-height: 1.35;
+      margin-bottom: 20px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 15px; color: var(--text-muted);
+      max-width: 480px; margin: 0 auto 36px;
+    }
+
+    .btn-line-main {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--line-green);
+      color: #fff; font-weight: 700; font-size: 16px;
+      padding: 16px 36px; border-radius: 50px;
+      text-decoration: none; border: none; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(6,199,85,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-line-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(6,199,85,0.45);
+    }
+
+    .btn-line-main svg { width: 22px; height: 22px; fill: #fff; }
+
+    .hero-note {
+      margin-top: 14px;
+      font-size: 12px; color: var(--text-muted);
+    }
+
+    .hero-visual {
+      margin-top: 52px;
+      display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+    }
+
+    .type-chip {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 8px 16px;
+      font-size: 13px; font-weight: 500;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .type-chip span { font-size: 16px; }
+
+    /* ── PROBLEM ── */
+    .problem {
+      padding: 72px 24px;
+      background: var(--white);
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+      color: var(--purple);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 700; line-height: 1.4;
+      margin-bottom: 48px;
+    }
+
+    .problem-grid {
+      max-width: 800px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .problem-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .problem-card .icon { font-size: 28px; margin-bottom: 12px; }
+
+    .problem-card p {
+      font-size: 14px; color: var(--text-muted); line-height: 1.7;
+    }
+
+    .problem-card strong { color: var(--text); display: block; margin-bottom: 6px; font-size: 15px; }
+
+    /* ── FEATURES ── */
+    .features {
+      padding: 72px 24px;
+      background: linear-gradient(180deg, #F5F3FF 0%, #FAFAFA 100%);
+    }
+
+    .feature-list {
+      max-width: 860px; margin: 0 auto;
+      display: flex; flex-direction: column; gap: 32px;
+    }
+
+    .feature-item {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 32px;
+      display: flex; gap: 28px; align-items: flex-start;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+    }
+
+    .feature-num {
+      flex-shrink: 0;
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      color: #fff;
+    }
+
+    .feature-body h3 {
+      font-size: 18px; font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .feature-body p {
+      font-size: 14px; color: var(--text-muted);
+      margin-bottom: 14px; line-height: 1.8;
+    }
+
+    .feature-example {
+      background: var(--purple-pale);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 13px;
+    }
+
+    .feature-example .label {
+      font-size: 11px; font-weight: 700; color: var(--purple);
+      letter-spacing: 0.05em; margin-bottom: 6px;
+    }
+
+    .feature-example .from { color: var(--text-muted); margin-bottom: 4px; }
+
+    .feature-example .arrow {
+      color: var(--purple); font-weight: 700; margin: 4px 0;
+    }
+
+    .feature-example .to { color: var(--text); font-weight: 500; }
+
+    .badge-soon {
+      display: inline-block;
+      background: var(--pink-pale); color: var(--pink);
+      font-size: 11px; font-weight: 700;
+      padding: 2px 10px; border-radius: 20px;
+      margin-left: 8px; vertical-align: middle;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how {
+      padding: 72px 24px;
+      background: var(--white);
+    }
+
+    .steps {
+      max-width: 700px; margin: 0 auto;
+      display: flex; flex-direction: column; gap: 0;
+    }
+
+    .step {
+      display: flex; gap: 20px; align-items: flex-start;
+      padding-bottom: 32px; position: relative;
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 20px; top: 44px;
+      width: 2px; height: calc(100% - 44px);
+      background: linear-gradient(to bottom, var(--purple-light), var(--purple-pale));
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px; color: #fff;
+      position: relative; z-index: 1;
+    }
+
+    .step-body h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; padding-top: 8px; }
+    .step-body p { font-size: 14px; color: var(--text-muted); }
+
+    /* ── CTA ── */
+    .cta {
+      padding: 80px 24px;
+      background: linear-gradient(135deg, #6D28D9, #9D174D);
+      text-align: center; color: #fff;
+    }
+
+    .cta h2 {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 700; margin-bottom: 14px;
+    }
+
+    .cta p {
+      font-size: 15px; opacity: 0.85; margin-bottom: 36px;
+    }
+
+    .btn-line-cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--line-green);
+      color: #fff; font-weight: 700; font-size: 17px;
+      padding: 18px 44px; border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 4px 24px rgba(6,199,85,0.4);
+      transition: transform 0.2s;
+    }
+
+    .btn-line-cta:hover { transform: translateY(-2px); }
+
+    .btn-line-cta svg { width: 24px; height: 24px; fill: #fff; }
+
+    .cta-note { margin-top: 16px; font-size: 12px; opacity: 0.7; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #1F1235;
+      color: rgba(255,255,255,0.6);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .footer-logo {
+      color: #fff; font-weight: 700; font-size: 16px;
+      margin-bottom: 16px;
+    }
+
+    .footer-links {
+      display: flex; justify-content: center; gap: 24px;
+      flex-wrap: wrap; margin-bottom: 20px;
+    }
+
+    .footer-links a {
+      color: rgba(255,255,255,0.6); text-decoration: none;
+      font-size: 13px; transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: #fff; }
+
+    .footer-copy {
+      font-size: 12px; opacity: 0.5;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .feature-item { flex-direction: column; gap: 16px; }
+      .type-chip { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo">
+      <div class="logo-icon">🔮</div>
+      エニアな関係
+    </a>
+    <a href="#line-cta" class="btn-line-sm">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M12 2C6.48 2 2 5.86 2 10.56c0 3.19 2.01 5.98 5.04 7.6L6 22l4.3-2.26c.55.15 1.12.22 1.7.22 5.52 0 10-3.86 10-8.6S17.52 2 12 2z"/></svg>
+      LINEで始める
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">エニアグラム × 人間関係</div>
+  <h1 class="hero-title">
+    「伝わらない」を<br><span>「伝わる」に変える</span>
+  </h1>
+  <p class="hero-desc">
+    相手がなぜそう動くのか、なぜすれ違うのか。<br>
+    エニアグラムの視点で、自分と大切な人との関係をもっとラクに。
+  </p>
+  <a href="#line-cta" class="btn-line-main" id="hero-line-btn">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 5.86 2 10.56c0 3.19 2.01 5.98 5.04 7.6L6 22l4.3-2.26c.55.15 1.12.22 1.7.22 5.52 0 10-3.86 10-8.6S17.52 2 12 2z"/></svg>
+    LINEで無料診断を始める
+  </a>
+  <p class="hero-note">無料・登録不要・1分で完了</p>
+
+  <div class="hero-visual">
+    <div class="type-chip"><span>💡</span> タイプ別翻訳機</div>
+    <div class="type-chip"><span>💑</span> 夫婦・カップル相性</div>
+    <div class="type-chip"><span>🌱</span> 毎日の気づきメッセージ</div>
+    <div class="type-chip"><span>🔍</span> 9タイプ無料診断</div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <p class="section-label">こんなこと、ありませんか？</p>
+  <h2 class="section-title">「なんでわかってくれないの」<br>の正体、知っていますか？</h2>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="icon">😤</div>
+      <strong>パートナーとすれ違う</strong>
+      <p>同じことを言っているのに、なぜか伝わらない。怒らせるつもりはないのに怒らせてしまう。</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🤔</div>
+      <strong>自分でも自分がわからない</strong>
+      <p>なぜ同じパターンを繰り返してしまうのか。なぜあの人の言葉が刺さるのか。</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">💬</div>
+      <strong>言葉の選び方がわからない</strong>
+      <p>相手を傷つけたくないのに、なぜか言い方でぶつかってしまう。</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <p class="section-label">サービス内容</p>
+  <h2 class="section-title">LINEで使える3つのツール</h2>
+  <div class="feature-list">
+
+    <div class="feature-item">
+      <div class="feature-num">💬</div>
+      <div class="feature-body">
+        <h3>タイプ別　言い回し翻訳機</h3>
+        <p>
+          「こう伝えたいけど、うまく言葉にできない」——相手のタイプを選んで、あなたの気持ちを入力するだけ。
+          相手の心に届く言い方に翻訳します。
+        </p>
+        <div class="feature-example">
+          <div class="label">翻訳例（タイプ1 完璧主義者 向け）</div>
+          <div class="from">あなた：「もっと効率よくやってほしい」</div>
+          <div class="arrow">↓ タイプ1向けに変換</div>
+          <div class="to">「あなたが大切にしている基準を守りながら、一緒に改善できたら嬉しい」</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-num">💑</div>
+      <div class="feature-body">
+        <h3>夫婦・カップル 相性チェック<span class="badge-soon">近日公開</span></h3>
+        <p>
+          2人のタイプを入力すると、すれ違いやすいポイントと、関係をよくするヒントを教えてくれます。
+          「なぜケンカになるのか」の構造が見えると、対処がラクになります。
+        </p>
+        <div class="feature-example">
+          <div class="label">分析例</div>
+          <div class="from">タイプ1（完璧主義）× タイプ7（熱狂家）</div>
+          <div class="arrow">↓</div>
+          <div class="to">「計画vs自由」の衝突パターンと、お互いが求めているものの違いを解説</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-num">🌱</div>
+      <div class="feature-body">
+        <h3>タイプ別　毎日の気づきメッセージ<span class="badge-soon">近日公開</span></h3>
+        <p>
+          あなたのタイプに合った、今日意識したいことを毎朝LINEで届けます。
+          自己観察を習慣にすることで、関係性が少しずつ変わっていきます。
+        </p>
+        <div class="feature-example">
+          <div class="label">今日のメッセージ例（タイプ2 献身家）</div>
+          <div class="from">—</div>
+          <div class="arrow"></div>
+          <div class="to">「今日は、誰かを助ける前に『自分は今何が必要か』を先に問いかけてみましょう」</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <p class="section-label">使い方</p>
+  <h2 class="section-title">3ステップで始められます</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>LINEを友だち追加する</h3>
+        <p>下のボタンからLINE公式アカウントを追加。無料で利用できます。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>エニアグラム診断を受ける</h3>
+        <p>いくつかの質問に答えるだけで、あなたの基本タイプがわかります（約1分）。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>翻訳機・相性チェックを使う</h3>
+        <p>タイプがわかったら、翻訳機や相性チェックをいつでも使えます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="line-cta">
+  <h2>まず、自分のタイプを知ることから</h2>
+  <p>無料診断はLINEから。登録不要・1分で完了します。</p>
+  <a href="https://lin.ee/SDMIE79" class="btn-line-cta" id="line-cta-btn">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 5.86 2 10.56c0 3.19 2.01 5.98 5.04 7.6L6 22l4.3-2.26c.55.15 1.12.22 1.7.22 5.52 0 10-3.86 10-8.6S17.52 2 12 2z"/></svg>
+    LINEで無料診断を始める
+  </a>
+  <p class="cta-note">個人情報の取り扱いについては<a href="privacy.html" style="color:rgba(255,255,255,0.7);text-decoration:underline;">プライバシーポリシー</a>をご確認ください</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">🔮 エニアな関係</div>
+  <div class="footer-links">
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="mailto:ennea_relation-contact@yahoo.co.jp">お問い合わせ</a>
+  </div>
+  <p class="footer-copy">© 2026 エニアな関係</p>
+</footer>
+
+</body>
+</html>
