@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>エニアグラム 夫婦関係診断</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7C3AED;
+            --primary-light: #A78BFA;
+            --secondary: #EC4899;
+            --accent: #F472B6;
+            --bg: #0F0A1E;
+            --surface: #1E1433;
+            --surface2: #2D1F4A;
+            --surface3: #3D2B60;
+            --text: #F0E6FF;
+            --text-muted: #9D7EC9;
+            --green: #34D399;
+            --orange: #FBBF24;
+            --blue: #60A5FA;
+            --card-bg: rgba(30, 20, 51, 0.85);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        button { touch-action: manipulation; }
+
+        html { overflow-x: hidden; }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── SCREENS ── */
+        .screen { display: none; min-height: 100vh; min-height: 100dvh; }
+        .screen.active { display: flex; flex-direction: column; }
+
+        /* ── WELCOME ── */
+        #welcome {
+            background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.4) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 80%, rgba(236,72,153,0.3) 0%, transparent 50%),
+                        var(--bg);
+            align-items: center;
+            justify-content: safe center;
+            text-align: center;
+            padding: 40px 24px;
+        }
+
+        .welcome-content { max-width: 360px; width: 100%; }
+
+        .welcome-orb {
+            width: 100px; height: 100px;
+            background: conic-gradient(from 0deg, #7C3AED, #EC4899, #7C3AED);
+            border-radius: 50%;
+            margin: 0 auto 28px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 44px;
+            box-shadow: 0 0 40px rgba(124,58,237,0.6), 0 0 80px rgba(236,72,153,0.3);
+            animation: orbPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes orbPulse {
+            0%, 100% { box-shadow: 0 0 40px rgba(124,58,237,0.6), 0 0 80px rgba(236,72,153,0.3); transform: scale(1); }
+            50% { box-shadow: 0 0 60px rgba(124,58,237,0.8), 0 0 120px rgba(236,72,153,0.5); transform: scale(1.04); }
+        }
+
+        .welcome-title {
+            font-size: 26px; font-weight: 700; line-height: 1.3;
+            background: linear-gradient(135deg, #A78BFA, #F472B6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 14px;
+        }
+
+        .welcome-desc {
+            font-size: 14px; color: var(--text-muted); line-height: 1.8;
+            margin-bottom: 36px;
+        }
+
+        .welcome-steps {
+            display: flex; justify-content: center; gap: 10px;
+            margin-bottom: 36px;
+        }
+
+        .step-item {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            flex: 1; max-width: 90px;
+        }
+
+        .step-icon {
+            width: 44px; height: 44px;
+            background: var(--surface2);
+            border: 1px solid rgba(124,58,237,0.4);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+
+        .step-label { font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.3; }
+
+        .step-arrow { color: var(--text-muted); font-size: 12px; align-self: flex-start; margin-top: 14px; }
+
+        /* ── BUTTONS ── */
+        .btn-primary {
+            width: 100%; padding: 16px;
+            background: linear-gradient(135deg, #7C3AED, #EC4899);
+            color: white; border: none; border-radius: 16px;
+            font-size: 17px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif;
+            cursor: pointer; letter-spacing: 0.5px;
+            box-shadow: 0 8px 30px rgba(124,58,237,0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .btn-primary:active { transform: scale(0.97); box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
+
+        .btn-ghost {
+            width: 100%; padding: 13px;
+            background: transparent; color: var(--text-muted);
+            border: 1px solid var(--surface3);
+            border-radius: 16px; font-size: 14px;
+            font-family: 'Noto Sans JP', sans-serif;
+            cursor: pointer; margin-top: 10px;
+            transition: all 0.2s;
+        }
+        .btn-ghost:active { background: var(--surface2); }
+
+        /* ── INFO MODAL ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75); z-index: 100;
+            align-items: flex-end; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+
+        .modal-sheet {
+            background: var(--surface);
+            border-radius: 24px 24px 0 0;
+            padding: 28px 24px 40px;
+            width: 100%; max-width: 480px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-handle {
+            width: 40px; height: 4px;
+            background: var(--surface3);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        .modal-title {
+            font-size: 19px; font-weight: 700;
+            margin-bottom: 16px; color: var(--accent);
+        }
+
+        .modal-body { font-size: 14px; color: var(--text-muted); line-height: 1.8; }
+        .modal-body strong { color: var(--text); }
+
+        .type-list-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 8px; margin: 16px 0;
+        }
+
+        .type-mini {
+            background: var(--surface2);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .type-mini-num {
+            font-size: 18px; font-weight: 700;
+            background: linear-gradient(135deg, #A78BFA, #F472B6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            min-width: 20px;
+        }
+
+        .type-mini-info { font-size: 12px; }
+        .type-mini-name { font-weight: 700; color: var(--text); }
+        .type-mini-sub { color: var(--text-muted); font-size: 11px; }
+
+        /* ── QUIZ HEADER ── */
+        .quiz-header {
+            padding: 16px 20px 0;
+            flex-shrink: 0;
+        }
+
+        .quiz-phase {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .phase-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px; font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .phase-self { background: rgba(167,139,250,0.2); color: #A78BFA; border: 1px solid rgba(167,139,250,0.3); }
+        .phase-partner { background: rgba(96,165,250,0.2); color: #60A5FA; border: 1px solid rgba(96,165,250,0.3); }
+
+        .phase-count { font-size: 13px; color: var(--text-muted); margin-left: auto; }
+
+        .progress-bar {
+            height: 3px; background: var(--surface2);
+            border-radius: 2px; overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7C3AED, #EC4899);
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        /* ── QUESTION AREA ── */
+        .question-area {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; padding: 24px 20px 0;
+            overflow-y: auto;
+        }
+
+        .q-number {
+            font-size: 12px; font-weight: 700;
+            color: var(--primary-light); letter-spacing: 1px;
+            text-transform: uppercase; margin-bottom: 14px;
+        }
+
+        .q-text {
+            font-size: 19px; font-weight: 500;
+            line-height: 1.65; margin-bottom: 36px;
+        }
+
+        /* ── RATING ── */
+        .rating-wrap { margin-bottom: 12px; }
+
+        .rating-scale {
+            display: flex; justify-content: space-between; gap: 6px;
+        }
+
+        .rating-btn {
+            flex: 1; min-height: 56px;
+            border: 2px solid var(--surface3);
+            background: var(--surface2);
+            color: var(--text-muted);
+            border-radius: 14px;
+            font-size: 16px; font-weight: 700;
+            font-family: 'Noto Sans JP', sans-serif;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .rating-btn.selected {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(236,72,153,0.25));
+            color: var(--text);
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(236,72,153,0.3);
+        }
+
+        .rating-labels {
+            display: flex; justify-content: space-between;
+            font-size: 11px; color: var(--text-muted);
+            padding: 0 4px; margin-top: 8px;
+        }
+
+        /* ── NAV BUTTONS ── */
+        .nav-buttons {
+            display: flex; gap: 10px;
+            padding: 20px;
+        }
+
+        .btn-back {
+            padding: 15px 20px;
+            background: var(--surface2);
+            color: var(--text-muted);
+            border: none; border-radius: 14px;
+            font-size: 22px; font-family: 'Noto Sans JP', sans-serif;
+            cursor: pointer; transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .btn-back:active { background: var(--surface3); }
+
+        .btn-next {
+            flex: 1; padding: 15px;
+            background: linear-gradient(135deg, #7C3AED, #EC4899);
+            color: white; border: none; border-radius: 14px;
+            font-size: 16px; font-weight: 700;
+            font-family: 'Noto Sans JP', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+            transition: all 0.15s;
+        }
+
+        .btn-next:disabled {
+            background: var(--surface2);
+            color: var(--text-muted);
+            box-shadow: none;
+            cursor: default;
+        }
+
+        .btn-next:not(:disabled):active { transform: scale(0.97); }
+
+        /* ── PARTNER INTRO ── */
+        #partner-intro {
+            align-items: center; justify-content: center;
+            padding: 40px 24px;
+            background: radial-gradient(ellipse at 30% 30%, rgba(96,165,250,0.25) 0%, transparent 60%), var(--bg);
+        }
+
+        .intro-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(96,165,250,0.25);
+            border-radius: 24px;
+            padding: 36px 24px;
+            max-width: 360px; width: 100%;
+            text-align: center;
+            backdrop-filter: blur(12px);
+        }
+
+        .intro-icon { font-size: 64px; margin-bottom: 20px; }
+
+        .intro-card h2 {
+            font-size: 21px; font-weight: 700;
+            color: #60A5FA; margin-bottom: 14px;
+        }
+
+        .intro-card p {
+            font-size: 14px; color: var(--text-muted);
+            line-height: 1.8; margin-bottom: 24px;
+        }
+
+        .self-result-mini {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(167,139,250,0.1);
+            border: 1px solid rgba(167,139,250,0.3);
+            border-radius: 12px; padding: 10px 16px;
+            margin-bottom: 24px;
+        }
+
+        .self-result-mini .num {
+            font-size: 24px; font-weight: 700;
+            background: linear-gradient(135deg, #A78BFA, #F472B6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .self-result-mini .info { text-align: left; }
+        .self-result-mini .label { font-size: 11px; color: var(--text-muted); }
+        .self-result-mini .name { font-size: 14px; font-weight: 700; }
+
+        /* ── CALCULATING ── */
+        #calculating {
+            align-items: center; justify-content: center;
+            background: var(--bg);
+        }
+
+        .calc-content { text-align: center; }
+
+        .calc-spinner {
+            width: 72px; height: 72px;
+            border: 3px solid var(--surface2);
+            border-top-color: var(--primary-light);
+            border-right-color: var(--accent);
+            border-radius: 50%;
+            margin: 0 auto 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .calc-text {
+            font-size: 16px; color: var(--text-muted);
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* ── RESULTS ── */
+        #results {
+            padding: 0 0 50px;
+            background: linear-gradient(180deg, #0F0A1E 0%, #1A0F30 100%);
+        }
+
+        .results-hero {
+            padding: 36px 20px 20px;
+            text-align: center;
+            background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.3) 0%, transparent 70%);
+        }
+
+        .results-hero h2 {
+            font-size: 22px; font-weight: 700;
+            background: linear-gradient(135deg, #A78BFA, #F472B6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .results-hero p { font-size: 13px; color: var(--text-muted); }
+
+        .type-cards-row {
+            display: flex; gap: 10px;
+            padding: 16px 20px 0;
+        }
+
+        .type-card {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px 14px;
+            text-align: center;
+            border: 1px solid;
+            backdrop-filter: blur(10px);
+        }
+
+        .type-card.self-card { border-color: rgba(167,139,250,0.35); }
+        .type-card.partner-card { border-color: rgba(96,165,250,0.35); }
+
+        .tc-label { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px; }
+
+        .tc-number {
+            font-size: 52px; font-weight: 700; line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .self-card .tc-number {
+            background: linear-gradient(135deg, #A78BFA, #F472B6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .partner-card .tc-number {
+            background: linear-gradient(135deg, #60A5FA, #34D399);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .tc-emoji { font-size: 26px; margin-bottom: 6px; }
+        .tc-name { font-size: 13px; font-weight: 700; }
+        .tc-keyword { font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.3; }
+
+        /* ── RESULTS SECTIONS ── */
+        .results-body { padding: 0 20px; }
+
+        .score-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(124,58,237,0.3);
+            border-radius: 20px;
+            padding: 24px 20px;
+            text-align: center;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .score-label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px; }
+
+        .score-value {
+            font-size: 64px; font-weight: 700; line-height: 1;
+            background: linear-gradient(135deg, #7C3AED, #EC4899);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .score-bar {
+            height: 6px; background: var(--surface2);
+            border-radius: 3px; overflow: hidden;
+            margin: 12px 0 10px;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7C3AED, #EC4899);
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        .score-desc { font-size: 15px; font-weight: 700; color: var(--accent); }
+
+        .section-title {
+            font-size: 16px; font-weight: 700;
+            margin: 24px 0 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--surface3);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-card-header {
+            font-size: 14px; font-weight: 700;
+            margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .info-card p {
+            font-size: 14px; color: var(--text-muted); line-height: 1.75;
+        }
+
+        .keyword-tag {
+            display: inline-block;
+            font-size: 11px; padding: 3px 10px;
+            border-radius: 20px; margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .tag-self { background: rgba(167,139,250,0.15); color: #C4B5FD; border: 1px solid rgba(167,139,250,0.25); }
+        .tag-partner { background: rgba(96,165,250,0.15); color: #93C5FD; border: 1px solid rgba(96,165,250,0.25); }
+
+        .list-card {
+            background: var(--card-bg);
+            border: 1px solid var(--surface3);
+            border-radius: 16px;
+            padding: 18px;
+            backdrop-filter: blur(10px);
+        }
+
+        .list-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 14px; line-height: 1.6;
+        }
+
+        .list-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+        .list-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 7px;
+        }
+
+        .dot-green { background: var(--green); box-shadow: 0 0 6px rgba(52,211,153,0.5); }
+        .dot-orange { background: var(--orange); box-shadow: 0 0 6px rgba(251,191,36,0.5); }
+        .dot-blue { background: var(--blue); box-shadow: 0 0 6px rgba(96,165,250,0.5); }
+
+        .btn-restart {
+            width: 100%; margin: 28px 20px 0;
+            width: calc(100% - 40px);
+            padding: 15px;
+            background: var(--surface);
+            color: var(--text-muted);
+            border: 1px solid var(--surface3);
+            border-radius: 16px;
+            font-size: 15px;
+            font-family: 'Noto Sans JP', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-restart:active { background: var(--surface2); }
+
+        /* ── SHARE / LINE CTA ── */
+        .btn-share-x {
+            width: 100%; padding: 15px;
+            background: #000;
+            color: #fff;
+            border: none; border-radius: 16px;
+            font-size: 15px; font-weight: 700;
+            font-family: 'Noto Sans JP', sans-serif;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-share-x:active { opacity: 0.8; }
+
+        .btn-line-cta-result {
+            display: block; width: 100%; padding: 15px;
+            background: #06C755;
+            color: #fff;
+            border-radius: 16px;
+            font-size: 15px; font-weight: 700;
+            text-align: center; text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .btn-line-cta-result:active { opacity: 0.8; }
+
+        /* ── FADE IN ── */
+        .fade-in { animation: fadeIn 0.5s ease both; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+
+<!-- ===== WELCOME ===== -->
+<div id="welcome" class="screen active">
+    <div class="welcome-content fade-in">
+        <div class="welcome-orb">💫</div>
+        <h1 class="welcome-title">エニアグラム<br>夫婦関係診断</h1>
+        <p class="welcome-desc">
+            自分とパートナーのタイプを診断して<br>
+            二人の関係をより深く理解し<br>
+            絆を育てるヒントを見つけましょう
+        </p>
+
+        <div class="welcome-steps">
+            <div class="step-item">
+                <div class="step-icon">🪞</div>
+                <div class="step-label">自己<br>診断</div>
+            </div>
+            <div class="step-arrow">›</div>
+            <div class="step-item">
+                <div class="step-icon">👫</div>
+                <div class="step-label">パートナー<br>診断</div>
+            </div>
+            <div class="step-arrow">›</div>
+            <div class="step-item">
+                <div class="step-icon">💬</div>
+                <div class="step-label">関係改善<br>アドバイス</div>
+            </div>
+        </div>
+
+<button class="btn-primary" onclick="startSelfQuiz()">診断をはじめる</button>
+        <button class="btn-ghost" onclick="openInfo()">エニアグラムとは？</button>
+    </div>
+</div>
+
+<!-- ===== INFO MODAL ===== -->
+<div id="info-modal" class="modal-overlay" onclick="closeInfoOutside(event)">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">エニアグラムとは？</div>
+        <div class="modal-body">
+            <p>エニアグラムは、人間の性格を<strong>9つのタイプ</strong>に分類する性格診断システムです。各タイプは固有の動機・恐れ・欲求を持ち、行動パターンや対人関係に影響します。</p>
+            <div class="type-list-grid" style="margin-top:16px;">
+                <div class="type-mini"><div class="type-mini-num">1</div><div class="type-mini-info"><div class="type-mini-name">完璧主義者</div><div class="type-mini-sub">⚖️ 正しさを求める</div></div></div>
+                <div class="type-mini"><div class="type-mini-num">2</div><div class="type-mini-info"><div class="type-mini-name">献身家</div><div class="type-mini-sub">💗 愛を与える</div></div></div>
+                <div class="type-mini"><div class="type-mini-num">3</div><div class="type-mini-info"><div class="type-mini-name">達成者</div><div class="type-mini-sub">🏆 成功を求める</div></div></div>
+                <div class="type-mini"><div class="type-mini-num">4</div><div class="type-mini-info"><div class="type-mini-name">個人主義者</div><div class="type-mini-sub">🎨 深みを求める</div></div></div>
+                <div class="type-mini"><div class="type-mini-num">5</div><div class="type-mini-info"><div class="type-mini-name">研究者</div><div class="type-mini-sub">🔍 知識を求める</div></div></div>
+                <div class="type-mini"><div class="type-mini-num">6</div><div class="type-mini-info"><div class="type-mini-name">忠実家</div><div class="type-mini-sub">🛡️ 安心を求める</div></div></div>
+                <div class="type-mini"><div class="type-mini-num">7</div><div class="type-mini-info"><div class="type-mini-name">熱中者</div><div class="type-mini-sub">✨ 喜びを求める</div></div></div>
+                <div class="type-mini"><div class="type-mini-num">8</div><div class="type-mini-info"><div class="type-mini-name">挑戦者</div><div class="type-mini-sub">🔥 力を求める</div></div></div>
+                <div class="type-mini"><div class="type-mini-num">9</div><div class="type-mini-info"><div class="type-mini-name">調停者</div><div class="type-mini-sub">☮️ 平和を求める</div></div></div>
+            </div>
+            <p style="margin-top:12px;">この診断は27問の自己診断と18問のパートナー観察で構成されています。正直に直感的に答えることで、より精度の高い結果が得られます。</p>
+        </div>
+        <button class="btn-primary" style="margin-top:20px;" onclick="closeInfo()">閉じる</button>
+    </div>
+</div>
+
+<!-- ===== SELF QUIZ ===== -->
+<div id="self-quiz" class="screen">
+    <div class="quiz-header">
+        <div class="quiz-phase">
+            <span class="phase-badge phase-self">自己診断</span>
+            <span class="phase-count" id="self-count">1 / 27</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="self-progress" style="width:4%"></div>
+        </div>
+    </div>
+    <div class="question-area">
+        <div class="q-number" id="self-q-num">Q 1</div>
+        <div class="q-text" id="self-q-text"></div>
+        <div class="rating-wrap">
+            <div class="rating-scale" id="self-scale">
+                <button class="rating-btn" onclick="selectRating('self',1)">1</button>
+                <button class="rating-btn" onclick="selectRating('self',2)">2</button>
+                <button class="rating-btn" onclick="selectRating('self',3)">3</button>
+                <button class="rating-btn" onclick="selectRating('self',4)">4</button>
+                <button class="rating-btn" onclick="selectRating('self',5)">5</button>
+            </div>
+            <div class="rating-labels"><span>全くちがう</span><span>とてもそう</span></div>
+        </div>
+    </div>
+    <div class="nav-buttons">
+        <button class="btn-back" id="self-back" onclick="prevQ('self')" style="display:none">‹</button>
+    </div>
+</div>
+
+<!-- ===== PARTNER INTRO ===== -->
+<div id="partner-intro" class="screen">
+    <div class="intro-card fade-in">
+        <div class="intro-icon">👫</div>
+        <h2>パートナー診断へ</h2>
+        <div class="self-result-mini">
+            <div class="num" id="intro-self-num">—</div>
+            <div class="info">
+                <div class="label">あなたのタイプ</div>
+                <div class="name" id="intro-self-name">—</div>
+            </div>
+        </div>
+        <p>
+            次に、パートナーの行動や言動から<br>
+            タイプを推定します。<br><br>
+            あなたの目から見た<br>
+            パートナーの普段の様子を<br>
+            思い浮かべながら答えてください。
+        </p>
+        <button class="btn-primary" onclick="startPartnerQuiz()">パートナー診断へ進む</button>
+    </div>
+</div>
+
+<!-- ===== PARTNER QUIZ ===== -->
+<div id="partner-quiz" class="screen">
+    <div class="quiz-header">
+        <div class="quiz-phase">
+            <span class="phase-badge phase-partner">パートナー診断</span>
+            <span class="phase-count" id="partner-count">1 / 18</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="partner-progress" style="width:6%"></div>
+        </div>
+    </div>
+    <div class="question-area">
+        <div class="q-number" id="partner-q-num">Q 1</div>
+        <div class="q-text" id="partner-q-text"></div>
+        <div class="rating-wrap">
+            <div class="rating-scale" id="partner-scale">
+                <button class="rating-btn" onclick="selectRating('partner',1)">1</button>
+                <button class="rating-btn" onclick="selectRating('partner',2)">2</button>
+                <button class="rating-btn" onclick="selectRating('partner',3)">3</button>
+                <button class="rating-btn" onclick="selectRating('partner',4)">4</button>
+                <button class="rating-btn" onclick="selectRating('partner',5)">5</button>
+            </div>
+            <div class="rating-labels"><span>全くちがう</span><span>とてもそう</span></div>
+        </div>
+    </div>
+    <div class="nav-buttons">
+        <button class="btn-back" onclick="prevQ('partner')">‹</button>
+    </div>
+</div>
+
+<!-- ===== CALCULATING ===== -->
+<div id="calculating" class="screen">
+    <div class="calc-content">
+        <div class="calc-spinner"></div>
+        <div class="calc-text">相性を分析中...</div>
+    </div>
+</div>
+
+<!-- ===== RESULTS ===== -->
+<div id="results" class="screen">
+    <div class="results-hero fade-in">
+        <h2>診断結果</h2>
+        <p>二人のタイプと関係性のアドバイス</p>
+    </div>
+    <div class="type-cards-row fade-in delay-1">
+        <div class="type-card self-card">
+            <div class="tc-label">あなた</div>
+            <div class="tc-number" id="r-self-num">—</div>
+            <div class="tc-emoji" id="r-self-emoji"></div>
+            <div class="tc-name" id="r-self-name">—</div>
+            <div class="tc-keyword" id="r-self-kw">—</div>
+        </div>
+        <div class="type-card partner-card">
+            <div class="tc-label">パートナー</div>
+            <div class="tc-number" id="r-partner-num">—</div>
+            <div class="tc-emoji" id="r-partner-emoji"></div>
+            <div class="tc-name" id="r-partner-name">—</div>
+            <div class="tc-keyword" id="r-partner-kw">—</div>
+        </div>
+    </div>
+    <div class="results-body">
+        <div id="results-content"></div>
+    </div>
+    <!-- シェア・LINE誘導 -->
+    <div id="share-section" style="padding: 0 20px 8px; display:flex; flex-direction:column; gap:12px;">
+        <button class="btn-share-x" onclick="shareToX()">𝕏 結果をXでシェア</button>
+        <a href="https://lin.ee/SDMIE79" class="btn-line-cta-result" target="_blank">
+            💬 翻訳機・相性チェックをLINEで使う
+        </a>
+        <p style="text-align:center;font-size:12px;color:#9D7EC9;">タイプ別の伝え方翻訳・毎朝のメッセージが無料で使えます</p>
+    </div>
+    <button class="btn-restart" onclick="restartQuiz()">最初からやり直す</button>
+</div>
+
+<script>
+// ======= DATA =======
+
+const selfQ = [
+    { text: "物事は正しいやり方で行われるべきだと強く感じる", t: 1 },
+    { text: "他人のミスや不正を見ると、どうしても気になって指摘したくなる", t: 1 },
+    { text: "自分に厳しく、高い基準を持って完璧を目指す", t: 1 },
+    { text: "周りの人が困っていると、放っておけずに助けたくなる", t: 2 },
+    { text: "人から必要とされたり感謝されると、特に嬉しい", t: 2 },
+    { text: "自分の気持ちより相手のニーズを優先してしまいがちだ", t: 2 },
+    { text: "目標を達成することで自分の価値を感じる", t: 3 },
+    { text: "他者からの評価や自分の見え方をかなり意識する", t: 3 },
+    { text: "効率よく結果を出すことが得意で、それを誇りにしている", t: 3 },
+    { text: "自分は他の人とは違う特別な存在だと感じることが多い", t: 4 },
+    { text: "深い感情や美的なものに強く惹かれる", t: 4 },
+    { text: "持っていないものへの憧れや喪失感を感じやすい", t: 4 },
+    { text: "一人の時間や自分だけの空間を強く必要とする", t: 5 },
+    { text: "感情より事実や論理に頼って物事を考える傾向がある", t: 5 },
+    { text: "エネルギーを使い過ぎないよう、関わる範囲を絞りたい", t: 5 },
+    { text: "起こりうるリスクや問題を事前に考えておく", t: 6 },
+    { text: "一度信頼した人や組織への忠誠心はとても強い", t: 6 },
+    { text: "不確かな状況や先の見えない状態では強い不安を感じる", t: 6 },
+    { text: "新しい体験や楽しいことを常に求めて行動する", t: 7 },
+    { text: "退屈や苦痛を感じると、次の楽しいことへ意識が向く", t: 7 },
+    { text: "計画や可能性を考えているとき、特にワクワクする", t: 7 },
+    { text: "自分の意志で物事をコントロールしたいと強く思う", t: 8 },
+    { text: "不正や弱者いじめを見ると強く反応して立ち向かいたくなる", t: 8 },
+    { text: "強さや率直さを大切にし、対立を恐れない", t: 8 },
+    { text: "争いや対立を避け、穏やかな人間関係を保ちたい", t: 9 },
+    { text: "自分の意見よりも、その場の雰囲気や相手に合わせてしまう", t: 9 },
+    { text: "人と繋がっているとき、深い安らぎと平和を感じる", t: 9 },
+];
+
+const partnerQ = [
+    { text: "パートナーはよく「こうすべき」「それは間違っている」と言う", t: 1 },
+    { text: "パートナーは家事や約束など、ルールや正確さにこだわる", t: 1 },
+    { text: "パートナーはあなたや家族の世話を積極的にしようとする", t: 2 },
+    { text: "パートナーは感謝されたり必要とされると、特に嬉しそうだ", t: 2 },
+    { text: "パートナーは仕事や目標に向かって精力的に取り組む", t: 3 },
+    { text: "パートナーは外での評判や自分の見え方をとても大切にしている", t: 3 },
+    { text: "パートナーは感情の起伏が激しく、深く傷つくことがある", t: 4 },
+    { text: "パートナーは「自分はわかってもらえない」という気持ちをよく表す", t: 4 },
+    { text: "パートナーは一人の時間を強く必要とし、距離を置くことがある", t: 5 },
+    { text: "パートナーは感情より事実や論理で話そうとすることが多い", t: 5 },
+    { text: "パートナーは心配性で、先の見通しをよく確認したがる", t: 6 },
+    { text: "パートナーは一度信頼すると深く忠実だが、疑い始めると長く引きずる", t: 6 },
+    { text: "パートナーは楽しいことや新しい体験を常に求めている", t: 7 },
+    { text: "パートナーは重い話題や問題から話をそらそうとすることがある", t: 7 },
+    { text: "パートナーははっきり意見を言い、議論になっても引かない", t: 8 },
+    { text: "パートナーはリーダーシップを取ろうとし、弱さを見せることを嫌う", t: 8 },
+    { text: "パートナーは争いを避け、あなたの意見に合わせることが多い", t: 9 },
+    { text: "パートナーは自分の意見をはっきり言わず、後になって不満を表すことがある", t: 9 },
+];
+
+const typeData = {
+    1: { name: "完璧主義者", emoji: "⚖️", keyword: "正しさを求める改革者", desc: "原則を大切にし、正しいことへの強い信念を持つ。責任感が強く高い基準で行動する。批判的に見られることがあるが、その根底には深い愛情と向上心がある。" },
+    2: { name: "献身家",   emoji: "💗", keyword: "愛を与えるサポーター", desc: "人を助けることに喜びを感じる温かい存在。感情的な繋がりを大切にし、他者のニーズに敏感。自分を後回しにしすぎる傾向があるが、その愛情は本物。" },
+    3: { name: "達成者",   emoji: "🏆", keyword: "成功を求めるパフォーマー", desc: "目標達成に向けて精力的に動く。有能で適応力があり、成功を通じて自己価値を確認する。外向きには輝いているが、内面では承認への欲求を持つ。" },
+    4: { name: "個人主義者", emoji: "🎨", keyword: "深みを求める表現者", desc: "独自の感受性と深い感情を持つ。自分らしさを大切にし、深い繋がりと意味を求める。時に感傷的になるが、その感受性は豊かな内面世界を生む。" },
+    5: { name: "研究者",   emoji: "🔍", keyword: "知識を求める観察者", desc: "知識と理解に価値を置く。観察力が高く内省的でプライバシーを大切にする。距離を置くように見えるが、信頼する相手には深く誠実。" },
+    6: { name: "忠実家",   emoji: "🛡️", keyword: "安心を求める守護者", desc: "信頼と安全を重視し、忠誠心が高い。責任感が強くリスクを意識して行動する。不安を感じやすいが、一度信頼すると誰よりも頼りになる存在。" },
+    7: { name: "熱中者",   emoji: "✨", keyword: "喜びを求める冒険家", desc: "楽観的で好奇心旺盛。新しい体験を求め多様な可能性を追いかける自由な精神の持ち主。苦痛を避ける面もあるが、周りに活力と喜びをもたらす。" },
+    8: { name: "挑戦者",   emoji: "🔥", keyword: "力を求めるリーダー", desc: "強い意志と保護本能を持つ。率直で決断力があり不正に果敢に立ち向かう。強引に見られることもあるが、その強さは大切な人を守りたい心から来る。" },
+    9: { name: "調停者",   emoji: "☮️", keyword: "平和を求めるメディエーター", desc: "調和と平和を愛し人々を繋ぎ合わせる。受容的で安定感があり対立を和らげる才能がある。自分を消してしまうことがあるが、その包容力は周りの安心感の源。" },
+};
+
+const advice = {
+    "1-1": { score:75, desc:"互いの高い基準が共鳴する関係", strengths:["共通の価値観と理想を持てる","誠実さと責任感が強い二人","一緒に環境を整える喜びがある"], challenges:["お互いを批判しやすく緊張が高まることがある","完璧主義が重なり息苦しくなることも","間違いを許し合うことが難しいかも"], tips:["相手の「正しさ」も尊重し、自分の基準を押しつけない","批判的に感じたときはユーモアで和らげる","「完璧」より「充分に良い」を互いに認める練習を"] },
+    "1-2": { score:80, desc:"原則と愛情が補い合う関係", strengths:["1が方向性を示し2が温かく支える","高い道徳観と深い愛情が組み合わさる","家庭を大切にする姿勢が共通"], challenges:["1の批判がパートナー（2）を傷つけやすい","2が献身的すぎると1が冷たく見える","感謝の表現が不足すると関係が冷える"], tips:["パートナーへの感謝を言葉で積極的に伝えて","2はニーズをはっきり伝え自分を犠牲にしすぎない","定期的に二人だけの温かい時間を作る"] },
+    "1-3": { score:72, desc:"理想と実績が交わる関係", strengths:["共に高い目標に向かって取り組める","お互いの努力を尊重できる","外からも信頼されるカップル"], challenges:["1は原則を3は結果を重視し価値観がずれることも","3のイメージ重視が1には表面的に映ることがある","深い感情的繋がりが後回しになりやすい"], tips:["成果だけでなくプロセスや価値観を話し合う習慣を","二人の「本当の姿」を見せ合う時間を持つ","競争相手でなく同じチームとしての関係を大切に"] },
+    "1-4": { score:70, desc:"原則と感受性が交わる関係", strengths:["共に深い意味と美しさを求める","互いの理想が刺激になる","誠実さと感受性が共鳴する"], challenges:["1の批判が4の傷つきやすさを刺激する","4の感情表現が1には過剰に見えることがある","完璧主義と感傷的傾向が衝突することも"], tips:["感情を論理で切り捨てず丁寧に受け止めて","4は批判を人格攻撃と受け取りすぎないよう意識して","共通の美的・創造的活動で繋がる"] },
+    "1-5": { score:78, desc:"原則と知性が共鳴する関係", strengths:["共に知的で議論を楽しめる","互いの独立心を尊重できる","誠実さと分析力が補い合う"], challenges:["感情的な繋がりが薄くなりやすい","1の「べき論」が5には押しつけに感じることも","二人とも批判的で会話が厳しくなることがある"], tips:["感情について意識的に話す機会を作る","互いのプライベートな時間を尊重し合う","「正しさ」の議論より温かさの交換を優先する"] },
+    "1-6": { score:82, desc:"責任感と忠誠心が支え合う関係", strengths:["共に責任感が強く信頼し合える","誠実で真面目な価値観が一致","安定した家庭を築きやすい"], challenges:["不安と批判が重なり緊張しやすいことがある","二人とも固くなりすぎて柔軟性を失うことも","楽しみや遊びの要素が欠けがちに"], tips:["完璧さより「今この瞬間」を楽しむ練習を","不安や批判を分かち合い安心感を育てる","遊びやユーモアを意識的に取り入れる"] },
+    "1-7": { score:68, desc:"原則と自由が引き合う関係", strengths:["7の楽観性が1を和らげる","1の方向性が7に安定をもたらす","互いに刺激し合える"], challenges:["1の批判が7を窮屈にさせる","7の軽さが1には無責任に映ることも","価値観のズレが大きく感じられることがある"], tips:["1は完璧を求めすぎず7の自由さを楽しんで","7は責任ある行動で1の信頼を築いて","共通の楽しみを通じて関係をほぐす"] },
+    "1-8": { score:73, desc:"原則と力が激突する関係", strengths:["共に強い意志と信念を持つ","互いに率直に話せる","目的意識が共鳴する"], challenges:["主導権争いが起きやすい","二人とも批判的で言い合いになることがある","柔らかさや妥協が難しい"], tips:["「勝ち負け」でなく「二人の答え」を探す習慣を","強さの裏にある傷つきやすさを見せ合う","お互いの率直さを批判でなく信頼のしるしと受け取る"] },
+    "1-9": { score:77, desc:"改革と調和が補い合う関係", strengths:["1の目標意識と9の包容力が補い合う","9が1の緊張を和らげる","安定した関係を築きやすい"], challenges:["1の批判が9を萎縮させることがある","9の受け身な態度が1にはもどかしく見える","変化への温度差が出ることも"], tips:["1は批判より提案で伝える方法を意識して","9は自分の意見や感情をはっきり伝える練習を","意思決定を二人で楽しむ時間を作る"] },
+
+    "2-1": { score:80, desc:"愛情と原則が深め合う関係", strengths:["2の温かさが1を和らげる","共に誠実で責任感がある","家庭を大切にする心が共通"], challenges:["2の過干渉が1を窮屈にさせることも","1が冷たく感じられると2が傷つく","感謝の言葉が不足しがち"], tips:["1は小さな感謝を言葉で伝えることを習慣に","2はパートナーのニーズを先読みしすぎず聞いてから動く","互いの「すること」と「存在すること」を両方大切に"] },
+    "2-2": { score:72, desc:"愛し合いながら自分を見失いやすい関係", strengths:["互いへの愛情が深く温かい家庭になる","共感力が高く支え合える","感情的な繋がりが強い"], challenges:["互いに与え続けて疲弊することがある","どちらも受け取ることが苦手で相手が傷つく","嫉妬や過干渉が問題になることも"], tips:["自分のニーズも大切にし受け取ることを練習して","「してあげること」より「一緒にいること」を楽しんで","個別の趣味や友人関係を大切に"] },
+    "2-3": { score:76, desc:"愛情と達成が共鳴する関係", strengths:["3の活力と2の温かさが補い合う","二人で目標を達成するパワーがある","社交的で魅力的なカップル"], challenges:["3が仕事優先になると2が孤独を感じる","2の感情表現が3には重く感じることも","深い感情的対話が後回しになりやすい"], tips:["3は定期的に「二人の時間」を優先して","2は感情を全部パートナーに委ねず自分の基盤を持つ","共通の目標だけでなく内面も話し合って"] },
+    "2-4": { score:78, desc:"愛情と深みが共鳴する関係", strengths:["感情的な共鳴が深い","互いの感受性を理解し合える","深い繋がりを求める姿勢が一致"], challenges:["感情が高ぶると収拾がつかなくなることも","4の自立心と2の依存心が衝突することがある","傷つきやすく関係が不安定になりやすい"], tips:["感情が激しいときは少し冷却期間を置いて","4は2の愛情を受け取る練習を","二人の絆を創造的に表現する活動を共にして"] },
+    "2-5": { score:65, desc:"愛情と距離感が対照的な関係", strengths:["5の分析力と2の感情力が補い合える","互いに相手にないものを持つ","尊重し合えれば豊かな関係に"], challenges:["5の距離感が2を傷つけやすい","2の過関与が5にはプレッシャーになる","感情と論理の行き違いが起きやすい"], tips:["2は5のプライベートな空間を尊重して","5は感情の言葉を意識的に増やして","距離感のルールを明確に話し合って決める"] },
+    "2-6": { score:82, desc:"愛情と安心が支え合う関係", strengths:["共に忠実で相手を大切にする","互いが安心の拠り所になれる","信頼関係が深い"], challenges:["2が尽くしすぎると6が罪悪感を感じることも","二人とも不安になると悪循環に","6の疑い深さが2を傷つけることがある"], tips:["安心感を言葉で伝え合う習慣を持って","不安や心配は二人で共有して小さくする","2は自分の不安も表現することを恐れないで"] },
+    "2-7": { score:74, desc:"愛情と喜びが弾む関係", strengths:["7の楽しさと2の温かさで明るい家庭に","共に社交的で人を楽しませる","感情的に生き生きとした関係"], challenges:["7の自由さが2には「雑に扱われている」と感じることも","2が深刻になると7は距離を置こうとする","感情の深さへの向き合い方が違う"], tips:["7は2の感情に逃げずに向き合う時間を持って","2は楽しいときの7と一緒に喜ぶことも大切に","深い話は日常の中に少しずつ取り入れて"] },
+    "2-8": { score:79, desc:"愛情と力が響き合う関係", strengths:["8の強さと2の温かさが互いを補う","互いに相手を保護したいと思える","深い信頼と強い絆が生まれやすい"], challenges:["8の強引さが2を圧倒することがある","2が与えすぎると8は「弱さ」と見ることも","2のニーズが後回しになりやすい"], tips:["8は感謝と脆弱さを2に見せる練習を","2は自分のニーズを恐れずに伝えて","力と愛情を互いに尊重する関係を育てて"] },
+    "2-9": { score:83, desc:"愛情と調和で包まれる関係", strengths:["共に相手を思いやる穏やかな関係","争いが少なく安定した家庭","互いの優しさが共鳴する"], challenges:["互いに自分のニーズを言えず不満が溜まることがある","どちらも主導しないと物事が進まない","表面的な平和の下に緊張が隠れることも"], tips:["定期的に「本当の気持ち」を話す安全な場を作って","小さな決断から意見を伝え合う練習を","愛情を行動だけでなく言葉でも伝えて"] },
+
+    "3-1": { score:72, desc:"達成と原則が高め合う関係", strengths:["共に高い目標を持ち励まし合える","お互いを尊重し信頼できる","外から見ても理想的なカップルに"], challenges:["競争心が関係に持ち込まれることがある","深い感情より成果を優先しがちに","原則か成果かで価値観がぶつかることも"], tips:["成功だけでなく素の自分を見せ合う時間を","一緒に何かを達成するより「一緒にいること」を楽しむ練習を","互いの失敗も受け入れ合える関係を育てて"] },
+    "3-2": { score:76, desc:"達成と愛情が支え合う関係", strengths:["3の目標力と2の支援力が強力なチームに","互いの役割が補い合う","明るく活力ある家庭になりやすい"], challenges:["3が忙しいと2が孤独感を感じる","2の感情表現が3には重くなることも","深い対話が後回しになりやすい"], tips:["3はパートナーへの時間を意識的に確保して","2は愛情を成果ではなく存在で確認する練習を","定期的に二人だけのゆっくりした時間を作る"] },
+    "3-3": { score:70, desc:"互いに輝こうとする競争と協力の関係", strengths:["共に活力があり目標を追いかける","互いの達成を喜べる関係","社交的で魅力的なカップル"], challenges:["成功や地位を競い合うことがある","素の自分を見せるのが怖くなることも","深い感情的繋がりが生まれにくい"], tips:["役割を競うより補い合う関係に意識を向けて","失敗したとき素直に話せる安心感を作って","イメージより「二人の本音」を大切にして"] },
+    "3-4": { score:74, desc:"達成と深みが引き合う関係", strengths:["4の深みが3に内省をもたらす","3の行動力が4を現実に繋ぎとめる","互いに相手にないものを補える"], challenges:["4の感情の深さが3には重荷に感じることも","3の成功主義が4を傷つけることがある","感情表現の温度差が大きい"], tips:["3は深い感情と向き合う勇気を持って","4は3の表現方法を尊重しながら感情を丁寧に伝えて","互いの「違い」を豊かさとして楽しんで"] },
+    "3-5": { score:71, desc:"行動と思考が交わる関係", strengths:["3の実行力と5の分析力が補い合う","互いに独立心を尊重できる","知的で目標志向な関係"], challenges:["感情的な繋がりが薄くなりやすい","3の社交性と5の内向性が衝突することも","共有の時間への温度差がある"], tips:["感情を意識的に表現する練習を二人でして","5のペースに合わせる時間と3の活動時間のバランスを","知的な共通の趣味で繋がりを深めて"] },
+    "3-6": { score:73, desc:"達成と安心が補い合う関係", strengths:["3の推進力と6の慎重さが良いバランスに","6の忠誠心が3に安心感を与える","実質的な目標を共に達成できる"], challenges:["6の不安が3の行動を遅らせることがある","3の変化の速さが6には不安に感じることも","深い信頼構築に時間がかかる"], tips:["3は決断の理由を丁寧に共有して","6は3の行動力を信頼する練習を","安心できる話し合いの習慣を作って"] },
+    "3-7": { score:77, desc:"達成と喜びが弾む関係", strengths:["共に活動的で楽しいことが好き","互いのエネルギーが相乗効果に","明るく前向きな関係"], challenges:["深い感情と向き合うことを避けがちに","両者とも忙しすぎて関係が希薄になることも","問題が起きたとき向き合えないことがある"], tips:["楽しい時間だけでなく深い対話の時間も意識して","問題を「楽しくない話題」として避けないで","二人だけのゆっくりした時間を定期的に確保して"] },
+    "3-8": { score:75, desc:"達成と力が結びつく力強い関係", strengths:["共に目標志向で行動力がある","率直に話し合える関係","互いの強さを尊重できる"], challenges:["主導権争いが起きやすい","柔らかさや弱さを見せ合うことが難しい","競争が関係に持ち込まれることがある"], tips:["「勝つ」より「共に成長する」という視点に切り替えて","脆弱な部分を見せ合う安全な場を作って","目標達成後は二人の時間を楽しんで"] },
+    "3-9": { score:76, desc:"達成と調和が補い合う関係", strengths:["3の行動力と9の包容力が良いチームに","9が3の緊張を和らげる","安定した環境で3が力を発揮できる"], challenges:["3のペースが9には速すぎることがある","9の受け身が3には物足りなく感じることも","意見を引き出すのに苦労することがある"], tips:["3は9の意見を積極的に聞き出して","9は自分の希望を積極的に伝える練習を","達成と休息のバランスを意識して"] },
+
+    "4-1": { score:70, desc:"感受性と原則が交わる関係", strengths:["共に理想を大切にする","深い意味と美を求める姿勢が共鳴","誠実さが互いを引き付ける"], challenges:["1の批判が4の傷つきやすさを刺激する","4の感情の激しさが1には難しく感じることも","完璧主義と感傷的傾向が衝突することがある"], tips:["感情を論理で否定せず受け止めて","4は批判を人格攻撃と受け取りすぎないよう意識して","共通の美的・創造的活動で繋がって"] },
+    "4-2": { score:78, desc:"感受性と愛情が共鳴する関係", strengths:["感情的な共鳴が深い","互いの感受性を理解し合える","深い繋がりを求める姿勢が一致"], challenges:["感情が高ぶると収拾がつかなくなることも","4の独自性と2の依存心が衝突することがある","傷つきやすく関係が不安定になりやすい"], tips:["感情が激しいときは少し冷却期間を置いて","4は2の愛情を受け取る練習を","二人の絆を創造的に表現する活動を共にして"] },
+    "4-3": { score:74, desc:"深みと達成が引き合う関係", strengths:["4の深みが3に内省をもたらす","3の行動力が4を現実に繋ぎとめる","互いに補い合える"], challenges:["4の感情の深さが3には重荷に感じることも","3の成功主義が4を傷つけることがある","感情表現の温度差が大きい"], tips:["3は深い感情と向き合う勇気を持って","4は3の表現方法を尊重しながら感情を丁寧に伝えて","互いの「違い」を豊かさとして楽しんで"] },
+    "4-4": { score:68, desc:"深みと感受性が共鳴し激しくなりやすい関係", strengths:["深い感情的繋がりが生まれやすい","互いを深く理解し合える","芸術的・精神的な共鳴が強い"], challenges:["互いの感情の嵐が増幅しやすい","二人とも理想化しすぎて失望しやすい","独自性への競争が起きることも"], tips:["感情的になったときの「冷却ルール」を決めて","互いの「普通の日常」も愛する練習を","外部のサポートも必要に応じて活用して"] },
+    "4-5": { score:75, desc:"感受性と知性が深く交わる関係", strengths:["共に深い思考と感受性を持つ","互いの独自性を尊重できる","精神的な繋がりが深い"], challenges:["5の距離感が4を深く傷つけることがある","4の感情の波に5が引いてしまうことも","どちらも内向きで交流が減ることがある"], tips:["5は感情的な存在感を意識的に示して","4は5の距離を拒絶として受け取らないよう意識して","深い知的・感情的対話の場を定期的に設けて"] },
+    "4-6": { score:73, desc:"感受性と安心が支え合う関係", strengths:["6の安定感が4に安心をもたらす","4の深みが6の内面を豊かにする","互いへの忠誠心が強い"], challenges:["4の感情の波と6の不安が重なることがある","6の疑い深さが4を傷つけることも","安定と変化への欲求が違う"], tips:["安定した日常の中に特別な瞬間を作って","不安や傷つきを正直に話し合える空間を大切に","互いへの信頼を言葉で確認し合う習慣を"] },
+    "4-7": { score:69, desc:"深みと軽さが対照的な関係", strengths:["7の楽観性が4の暗さを和らげる","4の深みが7に意味をもたらす","互いに新鮮な視点を与え合える"], challenges:["4の重さが7を引いてしまうことがある","7の軽さが4には浅く感じることも","感情への向き合い方に大きなズレがある"], tips:["7は4の深い感情から逃げず一緒にいて","4は7の明るいエネルギーを否定しないで","深い対話と楽しい活動を両方大切にして"] },
+    "4-8": { score:74, desc:"感受性と力が引き合う強烈な関係", strengths:["互いの強さと深さに惹かれ合う","感情的な強度が共鳴する","深い信頼ができると非常に強い絆に"], challenges:["8の強引さが4を傷つけることがある","4の感情表現が8には重すぎることも","激しいぶつかり合いが起きやすい"], tips:["8は4の繊細さを力強く守る優しさを見せて","4は8の強さの裏にある傷つきやすさを理解して","激しいときほど「愛している」という確認を"] },
+    "4-9": { score:77, desc:"感受性と調和が深まる関係", strengths:["9の受容力が4に安心をもたらす","互いの内面的な深さが共鳴する","穏やかで深い繋がりが生まれやすい"], challenges:["4の感情の激しさに9が疲れることがある","9が感情を避けると4が孤独を感じる","表面的な平和の下に本音が隠れることも"], tips:["9は4の感情に穏やかに付き合う忍耐を持って","4は9のペースも尊重して感情を伝えて","深い対話の時間と穏やかな時間のバランスを"] },
+
+    "5-1": { score:78, desc:"知性と原則が共鳴する関係", strengths:["知的な議論と共通の理想が共鳴","互いの独立心を尊重できる","誠実さと分析力が補い合う"], challenges:["感情的な繋がりが薄くなりやすい","批判的になりすぎることがある","二人とも自分のやり方にこだわる"], tips:["感情について意識的に話す機会を作って","互いのプライベートな時間を尊重し合って","「正しさ」の議論より温かさの交換を優先して"] },
+    "5-2": { score:65, desc:"知性と愛情が対照的な関係", strengths:["互いに相手にないものを持つ","5の分析力と2の感情力が補い合える","尊重し合えれば豊かな関係に"], challenges:["5の距離感が2を深く傷つける","2の過関与が5にはプレッシャーになる","感情と論理の行き違いが起きやすい"], tips:["2は5のプライベートな空間を尊重して","5は感情の言葉を意識的に増やして","距離感について具体的に話し合って決めて"] },
+    "5-3": { score:71, desc:"思考と行動が交わる関係", strengths:["3の実行力と5の分析力が補い合う","互いに独立心を尊重できる","知的で目標志向な関係"], challenges:["感情的な繋がりが薄くなりやすい","3の社交性と5の内向性が衝突することも","共有の時間への温度差がある"], tips:["感情を意識的に表現する練習を二人でして","5のペースに合わせる時間と3の活動時間のバランスを","知的な共通の趣味で繋がりを深めて"] },
+    "5-4": { score:75, desc:"知性と感受性が深く交わる関係", strengths:["共に深い思考と感受性を持つ","互いの独自性を尊重できる","精神的な繋がりが深い"], challenges:["5の距離感が4を深く傷つける","4の感情の波に5が引いてしまうことも","どちらも内向きで交流が減ることがある"], tips:["5は感情的な存在感を意識的に示して","4は5の距離を拒絶として受け取らないよう意識して","深い知的・感情的対話の場を定期的に設けて"] },
+    "5-5": { score:70, desc:"知性と独立心が共鳴する関係", strengths:["互いの独立心とプライバシーを理解できる","知的な対話が豊か","干渉し合わない関係が心地よい"], challenges:["感情的な繋がりが非常に薄くなりやすい","どちらも引っ込み思案で距離が縮まらないことも","関係の維持に意識的な努力が必要"], tips:["感情について意識的に話す場を定期的に作って","感謝や愛情を言葉で伝える習慣を意識的に作って","共通のプロジェクトや活動で繋がりを増やして"] },
+    "5-6": { score:76, desc:"知性と安心が補い合う関係", strengths:["5の冷静さと6の慎重さが補い合う","互いへの忠誠心と信頼が深い","安定した知的な関係"], challenges:["6の不安を5が冷たく感じることがある","5の距離感が6の不安を高めることも","感情的なサポートが不足しがち"], tips:["5は6の不安に冷静に寄り添う言葉を増やして","6は5の沈黙を拒絶として受け取らないよう意識して","定期的に「安心できる確認の時間」を作って"] },
+    "5-7": { score:72, desc:"内省と好奇心が引き合う関係", strengths:["共に知的好奇心が強い","互いに新しい視点を与え合える","知的な探求を共に楽しめる"], challenges:["5の静けさと7の活発さが衝突することがある","7の刺激への欲求が5を疲弊させることも","深い感情対話が生まれにくい"], tips:["7は5のエネルギーを尊重してペースを合わせて","5は7の楽しいエネルギーに積極的に乗ってみて","知的な冒険を共に楽しむ活動を見つけて"] },
+    "5-8": { score:74, desc:"知性と力が組み合わさる関係", strengths:["5の分析と8の実行力が強力なチームに","互いの独立心を尊重できる","強くて頼れる関係"], challenges:["8の強引さが5を圧迫することがある","5の引きこもりが8には不満に映ることも","感情的な繋がりが薄くなりやすい"], tips:["8は5のペースと空間を尊重して","5は感情や考えを8と積極的に共有して","共通のビジョンに向かって協力する活動を"] },
+    "5-9": { score:80, desc:"知性と平和が心地よく共鳴する関係", strengths:["互いのプライベートな空間を自然に尊重できる","穏やかで知的な対話を楽しめる","干渉し合わず安定した関係"], challenges:["感情的な繋がりが薄くなりやすい","どちらも受け身で関係が停滞することがある","問題を先送りにしがちに"], tips:["感情や本音を意識的に共有する時間を作って","どちらかが意識的にリードする役割を持って","二人の関係に意識的な「投資」をして"] },
+
+    "6-1": { score:82, desc:"忠誠心と原則が支え合う関係", strengths:["責任感と誠実さが深く共鳴","互いへの信頼が厚い","安定した家庭を築きやすい"], challenges:["不安と批判が重なり緊張しやすいことがある","柔軟性が失われることも","楽しみの要素が欠けがち"], tips:["完璧さより「今この瞬間」を楽しむ練習を","不安や批判を分かち合い安心感を育てて","遊びやユーモアを意識的に取り入れて"] },
+    "6-2": { score:82, desc:"安心と愛情が支え合う関係", strengths:["共に忠実で相手を大切にする","互いが安心の拠り所になれる","信頼関係が深い"], challenges:["二人とも不安になると悪循環に","6の疑い深さが2を傷つけることがある","表面的な平和の裏に緊張が隠れることも"], tips:["安心感を言葉で伝え合う習慣を持って","不安や心配は共有して小さくする","2は自分の不安も表現することを恐れないで"] },
+    "6-3": { score:73, desc:"安心と達成が補い合う関係", strengths:["3の推進力と6の慎重さが良いバランスに","6の忠誠心が3に安心感を与える","実質的な目標を共に達成できる"], challenges:["6の不安が3の行動を遅らせることがある","3の変化の速さが6には不安に感じることも","深い信頼構築に時間がかかる"], tips:["3は決断の理由を丁寧に共有して","6は3の行動力を信頼する練習を","安心できる話し合いの習慣を作って"] },
+    "6-4": { score:73, desc:"安心と感受性が深まる関係", strengths:["6の安定感が4に安心をもたらす","4の深みが6の内面を豊かにする","互いへの忠誠心が強い"], challenges:["4の感情の波と6の不安が重なることがある","6の疑い深さが4を傷つけることも","安定と変化への欲求が違う"], tips:["安定した日常の中に特別な瞬間を作って","不安や傷つきを正直に話し合える空間を大切に","互いへの信頼を言葉で確認し合う習慣を"] },
+    "6-5": { score:76, desc:"安心と知性が補い合う関係", strengths:["5の冷静さと6の慎重さが補い合う","互いへの忠誠心と信頼が深い","安定した知的な関係"], challenges:["6の不安を5が冷たく感じることがある","5の距離感が6の不安を高めることも","感情的なサポートが不足しがち"], tips:["5は6の不安に冷静に寄り添う言葉を増やして","6は5の沈黙を拒絶として受け取らないよう意識して","定期的に「安心できる確認の時間」を作って"] },
+    "6-6": { score:74, desc:"共に支え合い共に不安になる関係", strengths:["共に忠実で安定した関係","互いの不安を理解し合える","信頼関係が深く築かれやすい"], challenges:["互いの不安が増幅し合うことがある","リスクを避けすぎて新しい一歩が踏み出せないことも","疑い深さが互いに向かうことがある"], tips:["不安を分かち合いながら行動する勇気を育てて","「大丈夫」という言葉と実績を積み重ねて","二人で挑戦する小さな冒険を意識的に作って"] },
+    "6-7": { score:71, desc:"安心と喜びが引き合う関係", strengths:["7の楽観性が6の不安を和らげる","6の忠誠心が7に安心感をもたらす","互いに補い合える"], challenges:["6の不安が7には重く感じることも","7の自由さが6には不安を高めることがある","コミットメントへの考え方が違う"], tips:["7は6の不安に向き合う時間をとって","6は7の自由さを信頼の欠如として解釈しないで","安心できる約束と楽しい計画を両方大切に"] },
+    "6-8": { score:76, desc:"安心と力が結びつく堅固な関係", strengths:["8の強さが6に安心感をもたらす","6の忠誠心が8の信頼を勝ち取る","互いへの保護意識が強い"], challenges:["8の強引さが6の不安を高めることがある","6の疑い深さが8には信頼されていないように感じることも","感情的な対話が不足しがち"], tips:["8は6の不安を否定せず安心できる言葉をかけて","6は8を信頼し疑いをすぐ口にしないよう意識して","安全な環境での率直な対話を習慣にして"] },
+    "6-9": { score:82, desc:"安心と調和が心地よく共鳴する関係", strengths:["共に安定と調和を大切にする","互いへの忠実さと思いやりが深い","穏やかで安心感ある家庭を築けやすい"], challenges:["どちらも変化を避けて停滞することがある","問題を先送りにしがち","率直な意見交換が生まれにくい"], tips:["不安や不満を早めに言葉にする習慣を","定期的に「これからどうしたい？」と話し合って","小さな変化から挑戦する勇気を育てて"] },
+
+    "7-1": { score:68, desc:"自由と原則が引き合う関係", strengths:["7の楽観性が1を和らげる","1の方向性が7に安定をもたらす","互いに刺激し合える"], challenges:["1の批判が7を窮屈にさせる","7の軽さが1には無責任に映ることも","価値観のズレが大きく感じられることがある"], tips:["1は完璧を求めすぎず7の自由さを楽しんで","7は責任ある行動で1の信頼を築いて","共通の楽しみを通じて関係をほぐして"] },
+    "7-2": { score:74, desc:"喜びと愛情が弾む関係", strengths:["7の楽しさと2の温かさで明るい家庭に","共に社交的で人を楽しませる","感情的に生き生きとした関係"], challenges:["7の自由さが2には「雑に扱われている」と感じることも","2が深刻になると7は距離を置こうとする","感情の深さへの向き合い方が違う"], tips:["7は2の感情に逃げずに向き合う時間を持って","2は楽しいときの7と一緒に喜ぶことも大切に","深い話は日常の中に少しずつ取り入れて"] },
+    "7-3": { score:77, desc:"喜びと達成が弾む関係", strengths:["共に活動的で楽しいことが好き","互いのエネルギーが相乗効果に","明るく前向きな関係"], challenges:["深い感情と向き合うことを避けがちに","両者とも忙しすぎて関係が希薄になることも","問題が起きたとき向き合えないことがある"], tips:["楽しい時間だけでなく深い対話の時間も意識して","問題を「楽しくない話題」として避けないで","二人だけのゆっくりした時間を定期的に確保して"] },
+    "7-4": { score:69, desc:"軽さと深みが対照的な関係", strengths:["7の楽観性が4の暗さを和らげる","4の深みが7に意味をもたらす","互いに新鮮な視点を与え合える"], challenges:["4の重さが7を引いてしまうことがある","7の軽さが4には浅く感じることも","感情への向き合い方に大きなズレがある"], tips:["7は4の深い感情から逃げず一緒にいて","4は7の明るいエネルギーを否定しないで","深い対話と楽しい活動を両方大切にして"] },
+    "7-5": { score:72, desc:"好奇心と内省が引き合う関係", strengths:["共に知的好奇心が強い","互いに新しい視点を与え合える","知的な探求を共に楽しめる"], challenges:["5の静けさと7の活発さが衝突することがある","7の刺激への欲求が5を疲弊させることも","深い感情対話が生まれにくい"], tips:["7は5のエネルギーを尊重してペースを合わせて","5は7の楽しいエネルギーに積極的に乗ってみて","知的な冒険を共に楽しむ活動を見つけて"] },
+    "7-6": { score:71, desc:"喜びと安心が引き合う関係", strengths:["7の楽観性が6の不安を和らげる","6の忠誠心が7に安心感をもたらす","互いに補い合える"], challenges:["6の不安が7には重く感じることも","7の自由さが6には不安を高めることがある","コミットメントへの考え方が違う"], tips:["7は6の不安に向き合う時間をとって","6は7の自由さを信頼の欠如として解釈しないで","安心できる約束と楽しい計画を両方大切に"] },
+    "7-7": { score:72, desc:"喜びと自由が弾ける関係", strengths:["共に楽しいことや新しい体験を楽しめる","明るく活力のある関係","互いの自由を尊重できる"], challenges:["深い感情や問題に向き合うことを避けがちに","長期的なコミットメントが難しくなることも","都合の良い面しか見せない関係になりやすい"], tips:["楽しい関係の中に深い対話の時間を作って","困難なテーマに一緒に向き合う練習を","二人の未来計画を具体的に話し合って"] },
+    "7-8": { score:76, desc:"喜びと力が躍動する関係", strengths:["共に活力と行動力がある","互いに率直で明るい関係","刺激的で楽しい関係"], challenges:["8の強引さが7を窮屈にさせることがある","どちらも妥協が難しく衝突が起きやすい","深い感情対話が生まれにくい"], tips:["8は7の自由さと楽観性を楽しんで","7は8の深さと強さを信頼できるものとして受け入れて","激しい議論の後は和解と笑いで締めて"] },
+    "7-9": { score:78, desc:"喜びと調和が心地よく共鳴する関係", strengths:["7の活力と9の穏やかさが補い合う","9が7を落ち着かせ7が9を刺激する","楽しく穏やかな関係"], challenges:["9の受け身と7の先走りが衝突することがある","問題の先送りが起きやすい","9が7のペースに疲れることがある"], tips:["7は9のペースを尊重して待つ忍耐を持って","9は7の活力に乗っていく勇気を時々見せて","楽しい計画を一緒に立てて実行する習慣を"] },
+
+    "8-1": { score:73, desc:"力と原則が激突する関係", strengths:["共に強い意志と信念を持つ","互いに率直に話せる","目的意識が共鳴する"], challenges:["主導権争いが起きやすい","二人とも批判的で言い合いになることがある","柔らかさや妥協が難しい"], tips:["「勝ち負け」でなく「二人の答え」を探す習慣を","強さの裏にある傷つきやすさを見せ合って","お互いの率直さを批判でなく信頼のしるしと受け取って"] },
+    "8-2": { score:79, desc:"力と愛情が響き合う関係", strengths:["8の強さと2の温かさが互いを補う","互いに相手を保護したいと思える","深い信頼と強い絆が生まれやすい"], challenges:["8の強引さが2を圧倒することがある","2が与えすぎると8は「弱さ」と見ることも","2のニーズが後回しになりやすい"], tips:["8は感謝と脆弱さを2に見せる練習を","2は自分のニーズを恐れずに伝えて","力と愛情を互いに尊重する関係を育てて"] },
+    "8-3": { score:75, desc:"力と達成が結びつく力強い関係", strengths:["共に目標志向で行動力がある","率直に話し合える関係","互いの強さを尊重できる"], challenges:["主導権争いが起きやすい","柔らかさや弱さを見せ合うことが難しい","競争が関係に持ち込まれることがある"], tips:["「勝つ」より「共に成長する」という視点に切り替えて","脆弱な部分を見せ合う安全な場を作って","目標達成後は二人の時間を楽しんで"] },
+    "8-4": { score:74, desc:"力と感受性が引き合う強烈な関係", strengths:["互いの強さと深さに惹かれ合う","感情的な強度が共鳴する","深い信頼ができると非常に強い絆に"], challenges:["8の強引さが4を傷つけることがある","4の感情表現が8には重すぎることも","激しいぶつかり合いが起きやすい"], tips:["8は4の繊細さを力強く守る優しさを見せて","4は8の強さの裏にある傷つきやすさを理解して","激しいときほど「愛している」という確認を"] },
+    "8-5": { score:74, desc:"力と知性が組み合わさる関係", strengths:["5の分析と8の実行力が強力なチームに","互いの独立心を尊重できる","強くて頼れる関係"], challenges:["8の強引さが5を圧迫することがある","5の引きこもりが8には不満に映ることも","感情的な繋がりが薄くなりやすい"], tips:["8は5のペースと空間を尊重して","5は感情や考えを8と積極的に共有して","共通のビジョンに向かって協力する活動を"] },
+    "8-6": { score:76, desc:"力と安心が結びつく堅固な関係", strengths:["8の強さが6に安心感をもたらす","6の忠誠心が8の信頼を勝ち取る","互いへの保護意識が強い"], challenges:["8の強引さが6の不安を高めることがある","6の疑い深さが8には信頼されていないように感じることも","感情的な対話が不足しがち"], tips:["8は6の不安を否定せず安心できる言葉をかけて","6は8を信頼し疑いをすぐ口にしないよう意識して","安全な環境での率直な対話を習慣にして"] },
+    "8-7": { score:76, desc:"力と喜びが躍動する関係", strengths:["共に活力と行動力がある","互いに率直で明るい関係","刺激的で楽しい関係"], challenges:["8の強引さが7を窮屈にさせることがある","どちらも妥協が難しく衝突が起きやすい","深い感情対話が生まれにくい"], tips:["8は7の自由さと楽観性を楽しんで","7は8の深さと強さを信頼できるものとして受け入れて","激しい議論の後は和解と笑いで締めて"] },
+    "8-8": { score:71, desc:"力と力が激突する超強烈な関係", strengths:["互いへの尊重が根底にある","率直で正直な関係","どちらも強く対等な関係"], challenges:["支配欲の激しいぶつかり合いが起きやすい","どちらも引かないため解決が難しくなることも","弱さを見せ合うことが極端に難しい"], tips:["「どちらが強いか」でなく「どちらが賢いか」で判断して","弱さを見せることが本当の強さだと互いに認めて","信頼できる第三者のサポートを活用して"] },
+    "8-9": { score:79, desc:"力と平和が補い合う安定した関係", strengths:["8の強さと9の受容力が絶妙なバランスに","9が8の激しさを和らげる","深い安定感と信頼が生まれやすい"], challenges:["8の強引さが9を圧倒することがある","9が自分の意見を言えなくなることも","9の受け身が8には物足りなく感じることがある"], tips:["8は9が意見を言える安全な空間を意識して作って","9は自分の意見をはっきり伝える勇気を持って","9の穏やかさを8は「弱さ」でなく「強さ」と認めて"] },
+
+    "9-1": { score:77, desc:"調和と原則が補い合う関係", strengths:["9の包容力と1の理想が補い合う","9が1の緊張を和らげる","安定した関係を築きやすい"], challenges:["1の批判が9を萎縮させることがある","9の受け身な態度が1にはもどかしく見える","変化への温度差が出ることも"], tips:["1は批判より提案で伝える方法を意識して","9は自分の意見や感情をはっきり伝える練習を","意思決定を二人で楽しむ時間を作って"] },
+    "9-2": { score:83, desc:"調和と愛情で包まれる関係", strengths:["共に相手を思いやる穏やかな関係","争いが少なく安定した家庭","互いの優しさが共鳴する"], challenges:["互いに自分のニーズを言えず不満が溜まることがある","どちらも主導しないと物事が進まない","表面的な平和の下に緊張が隠れることも"], tips:["定期的に「本当の気持ち」を話す安全な場を作って","小さな決断から意見を伝え合う練習を","愛情を行動だけでなく言葉でも伝えて"] },
+    "9-3": { score:76, desc:"調和と達成が補い合う関係", strengths:["3の行動力と9の包容力が良いチームに","9が3の緊張を和らげる","安定した環境で3が力を発揮できる"], challenges:["3のペースが9には速すぎることがある","9の受け身が3には物足りなく感じることも","意見を引き出すのに苦労することがある"], tips:["3は9の意見を積極的に聞き出して","9は自分の希望を積極的に伝える練習を","達成と休息のバランスを意識して"] },
+    "9-4": { score:77, desc:"調和と感受性が深まる関係", strengths:["9の受容力が4に安心をもたらす","互いの内面的な深さが共鳴する","穏やかで深い繋がりが生まれやすい"], challenges:["4の感情の激しさに9が疲れることがある","9が感情を避けると4が孤独を感じる","表面的な平和の下に本音が隠れることも"], tips:["9は4の感情に穏やかに付き合う忍耐を持って","4は9のペースも尊重して感情を伝えて","深い対話の時間と穏やかな時間のバランスを"] },
+    "9-5": { score:80, desc:"調和と知性が心地よく共鳴する関係", strengths:["互いのプライベートな空間を自然に尊重できる","穏やかで知的な対話を楽しめる","干渉し合わず安定した関係"], challenges:["感情的な繋がりが薄くなりやすい","どちらも受け身で関係が停滞することがある","問題を先送りにしがちに"], tips:["感情や本音を意識的に共有する時間を作って","どちらかが意識的にリードする役割を持って","二人の関係に意識的な「投資」をして"] },
+    "9-6": { score:82, desc:"調和と安心が心地よく共鳴する関係", strengths:["共に安定と調和を大切にする","互いへの忠実さと思いやりが深い","穏やかで安心感ある家庭を築けやすい"], challenges:["どちらも変化を避けて停滞することがある","問題を先送りにしがち","率直な意見交換が生まれにくい"], tips:["不安や不満を早めに言葉にする習慣を","定期的に「これからどうしたい？」と話し合って","小さな変化から挑戦する勇気を育てて"] },
+    "9-7": { score:78, desc:"調和と喜びが心地よく共鳴する関係", strengths:["7の活力と9の穏やかさが補い合う","9が7を落ち着かせ7が9を刺激する","楽しく穏やかな関係"], challenges:["9の受け身と7の先走りが衝突することがある","問題の先送りが起きやすい","9が7のペースに疲れることがある"], tips:["7は9のペースを尊重して待つ忍耐を持って","9は7の活力に乗っていく勇気を時々見せて","楽しい計画を一緒に立てて実行する習慣を"] },
+    "9-8": { score:79, desc:"調和と力が補い合う安定した関係", strengths:["8の強さと9の受容力が絶妙なバランスに","9が8の激しさを和らげる","深い安定感と信頼が生まれやすい"], challenges:["8の強引さが9を圧倒することがある","9が自分の意見を言えなくなることも","9の受け身が8には物足りなく感じることがある"], tips:["8は9が意見を言える安全な空間を意識して作って","9は自分の意見をはっきり伝える勇気を持って","9の穏やかさを8は「弱さ」でなく「強さ」と認めて"] },
+    "9-9": { score:76, desc:"平和と平和がどこまでも穏やかな関係", strengths:["争いがなく非常に穏やかな関係","互いの存在が安らぎになる","深い共鳴と受容がある"], challenges:["どちらも主体性に欠け物事が停滞しやすい","問題を先送りにして積み重なることがある","自分の意見を言い合えず、すれ違いが蓄積することも"], tips:["定期的に「今感じていること」を正直に言い合う場を作って","小さな決断から意見を尊重し合う練習を","外からの刺激（旅行や新しい趣味）で関係に活力を"] },
+};
+
+// ======= STATE =======
+let curSelf = 0, curPartner = 0;
+let selfAns = new Array(selfQ.length).fill(null);
+let partnerAns = new Array(partnerQ.length).fill(null);
+let selfType = null, partnerType = null;
+let autoTimer = null;
+
+// ======= MODAL =======
+function openInfo() {
+    document.getElementById('info-modal').classList.add('open');
+}
+function closeInfo() {
+    document.getElementById('info-modal').classList.remove('open');
+}
+function closeInfoOutside(e) {
+    if (e.target === document.getElementById('info-modal')) closeInfo();
+}
+
+// ======= SCREEN =======
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+// ======= QUIZ FLOW =======
+function startSelfQuiz() {
+    curSelf = 0;
+    selfAns = new Array(selfQ.length).fill(null);
+    showScreen('self-quiz');
+    renderQ('self');
+}
+
+function startPartnerQuiz() {
+    curPartner = 0;
+    partnerAns = new Array(partnerQ.length).fill(null);
+    showScreen('partner-quiz');
+    renderQ('partner');
+}
+
+function renderQ(mode) {
+    const qs = mode === 'self' ? selfQ : partnerQ;
+    const ans = mode === 'self' ? selfAns : partnerAns;
+    const cur = mode === 'self' ? curSelf : curPartner;
+    const total = qs.length;
+
+    const pct = ((cur + 1) / total * 100).toFixed(1);
+    document.getElementById(`${mode}-progress`).style.width = pct + '%';
+    document.getElementById(`${mode}-count`).textContent = `${cur + 1} / ${total}`;
+    document.getElementById(`${mode}-q-num`).textContent = `Q ${cur + 1}`;
+    document.getElementById(`${mode}-q-text`).textContent = qs[cur].text;
+
+    // Rating buttons
+    const btns = document.querySelectorAll(`#${mode}-scale .rating-btn`);
+    btns.forEach((b, i) => {
+        b.classList.toggle('selected', ans[cur] === i + 1);
+    });
+
+    // Back button
+    const backBtn = document.getElementById(`${mode}-back`);
+    if (backBtn) backBtn.style.display = cur === 0 && mode === 'self' ? 'none' : 'block';
+
+}
+
+function selectRating(mode, val) {
+    const ans = mode === 'self' ? selfAns : partnerAns;
+    const cur = mode === 'self' ? curSelf : curPartner;
+
+    ans[cur] = val;
+
+    const btns = document.querySelectorAll(`#${mode}-scale .rating-btn`);
+    btns.forEach((b, i) => b.classList.toggle('selected', i + 1 === val));
+
+    // Auto advance
+    clearTimeout(autoTimer);
+    autoTimer = setTimeout(() => nextQ(mode), 450);
+}
+
+function nextQ(mode) {
+    clearTimeout(autoTimer);
+    const ans = mode === 'self' ? selfAns : partnerAns;
+    const qs = mode === 'self' ? selfQ : partnerQ;
+    const cur = mode === 'self' ? curSelf : curPartner;
+
+    if (ans[cur] === null) return;
+
+    if (cur < qs.length - 1) {
+        if (mode === 'self') curSelf++; else curPartner++;
+        renderQ(mode);
+    } else {
+        if (mode === 'self') {
+            selfType = calcType(selfAns, selfQ);
+            const si = typeData[selfType];
+            document.getElementById('intro-self-num').textContent = selfType;
+            document.getElementById('intro-self-name').textContent = si.emoji + ' ' + si.name;
+            showScreen('partner-intro');
+        } else {
+            partnerType = calcType(partnerAns, partnerQ);
+            showScreen('calculating');
+            setTimeout(showResults, 1800);
+        }
+    }
+}
+
+function prevQ(mode) {
+    clearTimeout(autoTimer);
+    const cur = mode === 'self' ? curSelf : curPartner;
+    if (mode === 'partner' && cur === 0) {
+        showScreen('partner-intro');
+        return;
+    }
+    if (cur > 0) {
+        if (mode === 'self') curSelf--; else curPartner--;
+        renderQ(mode);
+    }
+}
+
+function calcType(ans, qs) {
+    const scores = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+    ans.forEach((v, i) => { if (v !== null) scores[qs[i].t] += v; });
+    return parseInt(Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0]);
+}
+
+// ======= TYPE REPLACE =======
+function replaceTypes(text, st, pt) {
+    const particles = ['の', 'が', 'は', 'を', 'に', 'と', 'で', 'も'];
+    // Special pattern "パートナー（N）" → "パートナー"
+    text = text.replace(new RegExp(`パートナー（${pt}）`, 'g'), 'パートナー');
+    if (st !== pt) {
+        text = text.replace(new RegExp(`パートナー（${st}）`, 'g'), 'あなた');
+    }
+    particles.forEach(p => {
+        text = text.replace(new RegExp(`${st}${p}`, 'g'), `あなた${p}`);
+        if (st !== pt) {
+            text = text.replace(new RegExp(`${pt}${p}`, 'g'), `パートナー${p}`);
+        }
+    });
+    return text;
+}
+
+// ======= RESULTS =======
+function showResults() {
+    showScreen('results');
+
+    const si = typeData[selfType];
+    const pi = typeData[partnerType];
+    const key = `${selfType}-${partnerType}`;
+    const adv = advice[key];
+
+    // Cards
+    document.getElementById('r-self-num').textContent = selfType;
+    document.getElementById('r-self-emoji').textContent = si.emoji;
+    document.getElementById('r-self-name').textContent = si.name;
+    document.getElementById('r-self-kw').textContent = si.keyword;
+    document.getElementById('r-partner-num').textContent = partnerType;
+    document.getElementById('r-partner-emoji').textContent = pi.emoji;
+    document.getElementById('r-partner-name').textContent = pi.name;
+    document.getElementById('r-partner-kw').textContent = pi.keyword;
+
+    let html = '';
+
+    // Score
+    html += `
+    <div class="score-card fade-in delay-2">
+        <div class="score-label">相性スコア</div>
+        <div class="score-value">${adv.score}</div>
+        <div class="score-bar"><div class="score-bar-fill" id="score-bar-fill" style="width:0%"></div></div>
+        <div class="score-desc">${adv.desc}</div>
+    </div>`;
+
+    // Type descriptions
+    html += `<div class="section-title fade-in delay-2">💡 タイプの特徴</div>`;
+    html += `
+    <div class="info-card fade-in delay-3">
+        <div class="info-card-header" style="color:#A78BFA;">
+            タイプ${selfType} ${si.emoji} あなた
+        </div>
+        <div class="keyword-tag tag-self">${si.keyword}</div>
+        <p>${si.desc}</p>
+    </div>
+    <div class="info-card fade-in delay-3">
+        <div class="info-card-header" style="color:#60A5FA;">
+            タイプ${partnerType} ${pi.emoji} パートナー
+        </div>
+        <div class="keyword-tag tag-partner">${pi.keyword}</div>
+        <p>${pi.desc}</p>
+    </div>`;
+
+    // Strengths
+    html += `<div class="section-title fade-in delay-3">✨ あなたがたの強み</div>`;
+    html += `<div class="list-card fade-in delay-3">`;
+    adv.strengths.forEach(s => {
+        html += `<div class="list-item"><div class="list-dot dot-green"></div><span style="color:#E2F8EE;">${replaceTypes(s, selfType, partnerType)}</span></div>`;
+    });
+    html += `</div>`;
+
+    // Challenges
+    html += `<div class="section-title fade-in delay-4">⚡ 気をつけたいこと</div>`;
+    html += `<div class="list-card fade-in delay-4">`;
+    adv.challenges.forEach(c => {
+        html += `<div class="list-item"><div class="list-dot dot-orange"></div><span style="color:#FEF3C7;">${replaceTypes(c, selfType, partnerType)}</span></div>`;
+    });
+    html += `</div>`;
+
+    // Tips
+    html += `<div class="section-title fade-in delay-4">💬 関係改善のヒント</div>`;
+    html += `<div class="list-card fade-in delay-5">`;
+    adv.tips.forEach(t => {
+        html += `<div class="list-item"><div class="list-dot dot-blue"></div><span>${replaceTypes(t, selfType, partnerType)}</span></div>`;
+    });
+    html += `</div>`;
+
+    document.getElementById('results-content').innerHTML = html;
+
+    // Animate score bar
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            const bar = document.getElementById('score-bar-fill');
+            if (bar) bar.style.width = adv.score + '%';
+        }, 300);
+    });
+}
+
+function shareToX() {
+    const si = typeData[selfType];
+    const pi = typeData[partnerType];
+    const key = `${selfType}-${partnerType}`;
+    const score = advice[key].score;
+    const text = `エニアグラム夫婦関係診断やってみた！\n私はタイプ${selfType}（${si.name}）、パートナーはタイプ${partnerType}（${pi.name}）。\n相性スコアは${score}点でした✨\n\n#エニアグラム #夫婦 #相性診断`;
+    const url = 'https://shin-dan.pages.dev/shindan.html';
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+}
+
+function restartQuiz() {
+    curSelf = 0; curPartner = 0;
+    selfAns = new Array(selfQ.length).fill(null);
+    partnerAns = new Array(partnerQ.length).fill(null);
+    selfType = null; partnerType = null;
+    showScreen('welcome');
+}
+
+</script>
+</body>
+</html>

@@ -125,6 +125,18 @@
 
     .btn-line-main svg { width: 22px; height: 22px; fill: #fff; }
 
+    .btn-web-shindan {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: var(--purple); font-weight: 700; font-size: 15px;
+      padding: 13px 32px; border-radius: 50px;
+      border: 2px solid var(--purple);
+      text-decoration: none; cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      margin-top: 12px;
+    }
+    .btn-web-shindan:hover { background: var(--purple); color: #fff; }
+
     .hero-note {
       margin-top: 14px;
       font-size: 12px; color: var(--text-muted);
@@ -389,9 +401,12 @@
     相手がなぜそう動くのか、なぜすれ違うのか。<br>
     エニアグラムの視点で、自分と大切な人との関係をもっとラクに。
   </p>
-  <a href="#line-cta" class="btn-line-main" id="hero-line-btn">
-    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 5.86 2 10.56c0 3.19 2.01 5.98 5.04 7.6L6 22l4.3-2.26c.55.15 1.12.22 1.7.22 5.52 0 10-3.86 10-8.6S17.52 2 12 2z"/></svg>
-    LINEで無料診断を始める
+  <a href="shindan.html" class="btn-line-main" style="background:var(--purple); box-shadow:0 4px 20px rgba(124,58,237,0.35);" id="hero-shindan-btn">
+    🔍 夫婦相性を今すぐ診断する
+  </a>
+  <a href="#line-cta" class="btn-web-shindan" id="hero-line-btn">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 5.86 2 10.56c0 3.19 2.01 5.98 5.04 7.6L6 22l4.3-2.26c.55.15 1.12.22 1.7.22 5.52 0 10-3.86 10-8.6S17.52 2 12 2z"/></svg>
+    LINEで翻訳機・相性チェックを使う
   </a>
   <p class="hero-note">無料・登録不要・1分で完了</p>
 
