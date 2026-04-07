@@ -475,7 +475,7 @@
     showScreen("loading");
 
     try {
-      const res = await fetch("/translate", {
+      const res = await fetch("https://web-production-6db8c.up.railway.app/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: selectedType, message }),
