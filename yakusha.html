@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>伝え方翻訳機｜エニアグラム</title>
+  <meta name="description" content="相手のエニアグラムタイプを選んでメッセージを入力するだけ。すんなり伝わる言い方に翻訳します。">
+  <meta property="og:title" content="伝え方翻訳機｜エニアグラム">
+  <meta property="og:description" content="相手のタイプを選んでメッセージを入力するだけ。伝わる言い方に翻訳します。">
+  <meta property="og:url" content="https://enneagram-website.jemxiatak.workers.dev/yakusha">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #7C3AED;
+      --primary-light: #A78BFA;
+      --secondary: #EC4899;
+      --accent: #F472B6;
+      --bg: #0F0A1E;
+      --surface: #1E1433;
+      --surface2: #2D1F4A;
+      --surface3: #3D2B60;
+      --text: #F0E6FF;
+      --text-muted: #9D7EC9;
+      --green: #34D399;
+      --card-bg: rgba(30, 20, 51, 0.85);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    button { touch-action: manipulation; }
+    html { overflow-x: hidden; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── SCREENS ── */
+    .screen { display: none; min-height: 100vh; min-height: 100dvh; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* ── WELCOME ── */
+    #welcome {
+      background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.4) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 80%, rgba(236,72,153,0.3) 0%, transparent 50%),
+                  var(--bg);
+      align-items: center;
+      justify-content: safe center;
+      text-align: center;
+      padding: 48px 24px;
+    }
+
+    .welcome-content { max-width: 360px; width: 100%; }
+
+    .welcome-orb {
+      width: 100px; height: 100px;
+      background: conic-gradient(from 0deg, #7C3AED, #EC4899, #7C3AED);
+      border-radius: 50%;
+      margin: 0 auto 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 44px;
+      box-shadow: 0 0 40px rgba(124,58,237,0.6), 0 0 80px rgba(236,72,153,0.3);
+      animation: orbPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes orbPulse {
+      0%, 100% { box-shadow: 0 0 40px rgba(124,58,237,0.6), 0 0 80px rgba(236,72,153,0.3); transform: scale(1); }
+      50% { box-shadow: 0 0 60px rgba(124,58,237,0.8), 0 0 120px rgba(236,72,153,0.5); transform: scale(1.04); }
+    }
+
+    .welcome-title {
+      font-size: 26px; font-weight: 700; line-height: 1.3;
+      background: linear-gradient(135deg, #A78BFA, #F472B6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .welcome-desc {
+      font-size: 14px; color: var(--text-muted); line-height: 1.8;
+      margin-bottom: 32px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      width: 100%; padding: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white; font-size: 16px; font-weight: 700;
+      border: none; border-radius: 14px; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-primary:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(124,58,237,0.3); }
+
+    .btn-secondary {
+      width: 100%; padding: 14px;
+      background: transparent;
+      color: var(--text-muted); font-size: 14px;
+      border: 1px solid var(--surface3); border-radius: 14px; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-secondary:active { background: var(--surface2); }
+
+    /* ── TYPE SELECT ── */
+    #type-select {
+      background: var(--bg);
+      padding: 32px 20px;
+      align-items: center;
+    }
+
+    .step-header {
+      width: 100%; max-width: 400px;
+      margin-bottom: 24px;
+    }
+
+    .step-label {
+      font-size: 12px; color: var(--text-muted); letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+
+    .step-title {
+      font-size: 20px; font-weight: 700;
+      background: linear-gradient(135deg, #A78BFA, #F472B6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .type-grid {
+      width: 100%; max-width: 400px;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-bottom: 24px;
+    }
+
+    .type-card {
+      background: var(--surface);
+      border: 1.5px solid var(--surface3);
+      border-radius: 14px;
+      padding: 14px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .type-card:active { background: var(--surface2); }
+    .type-card.selected {
+      border-color: var(--primary-light);
+      background: rgba(124,58,237,0.15);
+    }
+
+    .type-num {
+      font-size: 22px; font-weight: 700;
+      background: linear-gradient(135deg, #A78BFA, #F472B6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 4px;
+    }
+
+    .type-name {
+      font-size: 11px; color: var(--text-muted); line-height: 1.3;
+    }
+
+    /* ── MESSAGE INPUT ── */
+    #message-input {
+      background: var(--bg);
+      padding: 32px 20px;
+      align-items: center;
+    }
+
+    .input-area {
+      width: 100%; max-width: 400px;
+      margin-bottom: 20px;
+    }
+
+    .selected-type-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(124,58,237,0.2);
+      border: 1px solid rgba(167,139,250,0.4);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px; color: var(--primary-light);
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%; min-height: 140px;
+      background: var(--surface);
+      border: 1.5px solid var(--surface3);
+      border-radius: 14px;
+      color: var(--text);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 15px;
+      padding: 16px;
+      resize: none;
+      outline: none;
+      transition: border-color 0.15s;
+      line-height: 1.7;
+    }
+    textarea:focus { border-color: var(--primary-light); }
+    textarea::placeholder { color: var(--text-muted); }
+
+    .char-count {
+      text-align: right;
+      font-size: 12px; color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* ── LOADING ── */
+    #loading {
+      background: var(--bg);
+      align-items: center; justify-content: center;
+      text-align: center;
+    }
+
+    .loading-orb {
+      width: 80px; height: 80px;
+      background: conic-gradient(from 0deg, #7C3AED, #EC4899, #7C3AED);
+      border-radius: 50%;
+      margin: 0 auto 24px;
+      animation: spin 1.2s linear infinite;
+      font-size: 36px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-size: 16px; color: var(--text-muted);
+    }
+
+    /* ── RESULT ── */
+    #result {
+      background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.3) 0%, transparent 60%), var(--bg);
+      padding: 32px 20px;
+      align-items: center;
+    }
+
+    .result-content { width: 100%; max-width: 400px; }
+
+    .result-label {
+      font-size: 12px; color: var(--text-muted);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .result-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(52,211,153,0.15);
+      border: 1px solid rgba(52,211,153,0.4);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 12px; color: var(--green);
+      margin-bottom: 16px;
+    }
+
+    .result-box {
+      background: var(--surface);
+      border: 1.5px solid var(--surface3);
+      border-radius: 16px;
+      padding: 20px;
+      font-size: 15px; line-height: 1.8;
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .result-actions {
+      display: flex; flex-direction: column; gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .btn-copy {
+      width: 100%; padding: 14px;
+      background: var(--surface2);
+      color: var(--text); font-size: 14px; font-weight: 500;
+      border: 1.5px solid var(--surface3); border-radius: 14px; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-copy.copied { border-color: var(--green); color: var(--green); }
+
+    .btn-x-share {
+      width: 100%; padding: 14px;
+      background: #000;
+      color: white; font-size: 14px; font-weight: 700;
+      border: 1.5px solid #333; border-radius: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    .line-banner {
+      background: var(--surface);
+      border: 1.5px solid rgba(6,199,85,0.3);
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .line-banner-title {
+      font-size: 13px; color: var(--text-muted); margin-bottom: 10px;
+    }
+
+    .btn-line {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #06C755;
+      color: white; font-size: 14px; font-weight: 700;
+      border: none; border-radius: 12px; cursor: pointer;
+      padding: 12px 24px;
+      text-decoration: none;
+    }
+
+    .divider { height: 1px; background: var(--surface2); margin: 20px 0; }
+
+    /* ── BACK BUTTON ── */
+    .back-btn {
+      position: fixed; top: 16px; left: 16px;
+      width: 40px; height: 40px;
+      background: var(--surface);
+      border: 1.5px solid var(--surface3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 18px;
+      color: var(--text-muted);
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="welcome" class="screen active">
+  <div class="welcome-content">
+    <div class="welcome-orb">🔄</div>
+    <div class="welcome-title">伝え方翻訳機</div>
+    <div class="welcome-desc">
+      相手のエニアグラムタイプを選ぶだけ。<br>
+      あなたの言葉を、相手に<strong>すんなり伝わる表現</strong>に翻訳します。
+    </div>
+    <button class="btn-primary" onclick="showScreen('type-select')">
+      翻訳スタート →
+    </button>
+    <div style="margin-top: 16px;">
+      <a href="shindan" style="color: var(--text-muted); font-size: 13px; text-decoration: none;">
+        相手のタイプがわからない？相性診断はこちら →
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- TYPE SELECT -->
+<div id="type-select" class="screen">
+  <button class="back-btn" onclick="showScreen('welcome')">←</button>
+  <div style="width:100%; max-width:400px; margin: 0 auto; padding: 60px 20px 32px;">
+    <div class="step-header">
+      <div class="step-label">STEP 1</div>
+      <div class="step-title">相手のタイプは？</div>
+    </div>
+    <div class="type-grid" id="typeGrid"></div>
+    <button class="btn-primary" id="typeNextBtn" onclick="goToMessage()" disabled style="opacity:0.4; max-width:400px; width:100%;">
+      次へ →
+    </button>
+  </div>
+</div>
+
+<!-- MESSAGE INPUT -->
+<div id="message-input" class="screen">
+  <button class="back-btn" onclick="showScreen('type-select')">←</button>
+  <div style="width:100%; max-width:400px; margin: 0 auto; padding: 60px 20px 32px;">
+    <div class="step-header">
+      <div class="step-label">STEP 2</div>
+      <div class="step-title">伝えたいことは？</div>
+    </div>
+    <div class="input-area">
+      <div class="selected-type-badge">
+        <span>🎯</span>
+        <span id="selectedTypeBadge">タイプ1</span>に翻訳
+      </div>
+      <textarea
+        id="messageText"
+        placeholder="例：もっと時間を守ってほしい&#10;例：一緒にいると楽しい&#10;例：最近どう？"
+        maxlength="300"
+        oninput="updateCharCount(this)"
+      ></textarea>
+      <div class="char-count"><span id="charCount">0</span> / 300</div>
+    </div>
+    <button class="btn-primary" id="translateBtn" onclick="doTranslate()">
+      翻訳する ✨
+    </button>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="loading" class="screen">
+  <div class="loading-orb">✨</div>
+  <div class="loading-text">翻訳中…</div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="screen">
+  <button class="back-btn" onclick="showScreen('message-input')">←</button>
+  <div class="result-content" style="padding: 60px 20px 48px;">
+    <div class="result-label">翻訳結果</div>
+    <div class="result-badge">
+      <span>✅</span>
+      <span id="resultTypeBadge">タイプ1向け</span>
+    </div>
+    <div class="result-box" id="resultText"></div>
+
+    <div class="result-actions">
+      <button class="btn-copy" id="copyBtn" onclick="copyResult()">
+        📋 コピーする
+      </button>
+      <button class="btn-x-share" id="xShareBtn" onclick="shareOnX()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        Xでシェア
+      </button>
+    </div>
+
+    <div class="line-banner">
+      <div class="line-banner-title">タイプ別の傾向をもっと深く知りたい？</div>
+      <a class="btn-line" href="https://lin.ee/Qxtv4ya" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+        LINEで詳しく見る
+      </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="btn-secondary" onclick="resetAll()">
+      もう一度翻訳する
+    </button>
+  </div>
+</div>
+
+<script>
+  const TYPE_NAMES = {
+    1: "改革者", 2: "助人者", 3: "達成者",
+    4: "個人主義者", 5: "研究者", 6: "忠実者",
+    7: "熱中者", 8: "挑戦者", 9: "平和主義者"
+  };
+
+  let selectedType = null;
+
+  // タイプグリッド生成
+  const grid = document.getElementById("typeGrid");
+  for (let i = 1; i <= 9; i++) {
+    const card = document.createElement("div");
+    card.className = "type-card";
+    card.id = `typeCard${i}`;
+    card.innerHTML = `<div class="type-num">${i}</div><div class="type-name">${TYPE_NAMES[i]}</div>`;
+    card.onclick = () => selectType(i);
+    grid.appendChild(card);
+  }
+
+  function selectType(n) {
+    selectedType = n;
+    document.querySelectorAll(".type-card").forEach(c => c.classList.remove("selected"));
+    document.getElementById(`typeCard${n}`).classList.add("selected");
+    const btn = document.getElementById("typeNextBtn");
+    btn.disabled = false;
+    btn.style.opacity = "1";
+  }
+
+  function goToMessage() {
+    if (!selectedType) return;
+    document.getElementById("selectedTypeBadge").textContent = `タイプ${selectedType}（${TYPE_NAMES[selectedType]}）`;
+    showScreen("message-input");
+  }
+
+  function updateCharCount(el) {
+    document.getElementById("charCount").textContent = el.value.length;
+  }
+
+  async function doTranslate() {
+    const message = document.getElementById("messageText").value.trim();
+    if (!message) {
+      alert("メッセージを入力してください");
+      return;
+    }
+
+    showScreen("loading");
+
+    try {
+      const res = await fetch("/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: selectedType, message }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "翻訳に失敗しました");
+      }
+
+      document.getElementById("resultTypeBadge").textContent = `タイプ${selectedType}（${TYPE_NAMES[selectedType]}）向け`;
+      document.getElementById("resultText").textContent = data.translated;
+      showScreen("result");
+
+    } catch (e) {
+      showScreen("message-input");
+      alert("翻訳に失敗しました。もう一度お試しください。");
+    }
+  }
+
+  function copyResult() {
+    const text = document.getElementById("resultText").textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById("copyBtn");
+      btn.textContent = "✅ コピーしました！";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = "📋 コピーする";
+        btn.classList.remove("copied");
+      }, 2000);
+    });
+  }
+
+  function shareOnX() {
+    const text = document.getElementById("resultText").textContent;
+    const url = "https://enneagram-website.jemxiatak.workers.dev/yakusha";
+    const tweet = `エニアグラム伝え方翻訳機で変換しました✨\n\n${text}\n\n#エニアグラム\n${url}`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`, "_blank");
+  }
+
+  function resetAll() {
+    document.getElementById("messageText").value = "";
+    document.getElementById("charCount").textContent = "0";
+    document.getElementById("copyBtn").textContent = "📋 コピーする";
+    document.getElementById("copyBtn").classList.remove("copied");
+    showScreen("type-select");
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    window.scrollTo(0, 0);
+  }
+</script>
+</body>
+</html>
