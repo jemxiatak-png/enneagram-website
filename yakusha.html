@@ -483,6 +483,12 @@
 
       const data = await res.json();
 
+      if (res.status === 429) {
+        showScreen("message-input");
+        alert("1時間の翻訳回数（10回）に達しました。時間をおいてお試しください。");
+        return;
+      }
+
       if (!res.ok || data.error) {
         throw new Error(data.error || "翻訳に失敗しました");
       }
